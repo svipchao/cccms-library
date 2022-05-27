@@ -1,0 +1,42 @@
+{
+  "name": "svipchao/think-library",
+  "description": "ThinkPHP6.* Library 扩展包",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "诗无尽头i",
+      "email": "svipchao@qq.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "php": ">=7.4",
+    "ext-gd": "*",
+    "ext-curl": "*",
+    "ext-json": "*",
+    "ext-iconv": "*",
+    "ext-openssl": "*",
+    "ext-mbstring": "*",
+    "topthink/framework": "^6.0",
+    "topthink/think-view": "^1.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "v9.5.11"
+  },
+  "autoload": {
+    "files": [
+      "src/common.php"
+    ],
+    "psr-4": {
+      "cccms\\": "src/"
+    }
+  },
+  "extra": {
+    "think": {
+      "services": [
+        "cccms\\Library"
+      ]
+    }
+  }
+}
