@@ -16,6 +16,7 @@ class SysGroup extends Model
         Cache::delete('SysGroups');
     }
 
+
     public function roles(): belongsToMany
     {
         return $this->belongsToMany(SysRole::class, SysGroupRole::class, 'role_id', 'group_id');
