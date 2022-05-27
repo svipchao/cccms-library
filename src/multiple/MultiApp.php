@@ -183,10 +183,18 @@ class MultiApp
         $this->appName = $appName;
         $this->app->http->name($appName);
 
-        $appPath = $this->path ?: $this->app->getBasePath() . $appName . DIRECTORY_SEPARATOR;
+        $ds = DIRECTORY_SEPARATOR;
 
-        $appPathLibrary = $this->path ?: $this->app->getRootPath() . 'vendor\\svipchao\\cccms-app\\src\\' . $appName . DIRECTORY_SEPARATOR;
-        if (file_exists($appPathLibrary . 'controller\\' . ucfirst(explode('/', request()->pathinfo())[0]) . '.php')) {
+        $appPath = $this->path ?: $this->app->getBasePath() . $appName . $ds;
+
+        $appPathLibrary = $this->path ?: $this->app->getRootPath() . 'vendor/svipchao/cccms-app/src/' . $appName . $ds;
+        $pathInfo = $this->app->request->pathinfo();
+        $route = config('route');
+        if (empty($pathInfo)) {
+            $pathInfo = $appName . $ds . $route['default_controller'] . $ds . $route['default_action'];
+        }
+        [, $controller,] = explode($ds, $pathInfo);
+        if (file_exists($appPathLibrary . 'controller' . $ds . ucfirst($controller) . '.php')) {
             $appPath = $appPathLibrary;
         }
 

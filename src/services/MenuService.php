@@ -5,7 +5,7 @@ namespace cccms\services;
 
 use cccms\Service;
 use cccms\extend\ArrExtend;
-use cccms\model\{SysTypes, SysMenu};
+use app\admin\model\{SysTypes, SysMenu};
 
 class MenuService extends Service
 {

@@ -4,7 +4,7 @@ declare (strict_types=1);
 namespace cccms;
 
 use cccms\extend\StrExtend;
-use cccms\model\SysUserGroup;
+use app\admin\model\SysUserGroup;
 use cccms\services\{AuthService, InitService};
 
 abstract class Model extends \think\Model

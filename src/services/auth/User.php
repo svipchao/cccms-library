@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace cccms\services\auth;
 
 use think\facade\Db;
-use cccms\model\{SysUser, SysGroup, SysRole};
+use app\admin\model\{SysUser, SysGroup, SysRole};
 use cccms\extend\ArrExtend;
 use cccms\services\NodeService;
 
@@ -29,7 +29,6 @@ trait User
     public function setUserInfo(array $condition = []): array
     {
         if (empty($condition) && empty(_getAccessToken('id'))) return [];
-        // 这里不要用模型 全局查询会有问题
         $condition = $condition ?: ['id' => _getAccessToken('id')];
         if (isset($condition['id']) && $condition['id'] == 1) {
             $userInfo = SysUser::mk()->_read(1);

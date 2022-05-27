@@ -19,24 +19,19 @@ class Library extends Service
         // 绑定URL类
         $this->app->bind(['think\route\Url' => Url::class]);
         // 设置配置文件
-        $configPath = NodeService::instance()->scanDirArray($this->app->getRootPath() . 'cccms/config/', []);
+        $configPath = array_merge_recursive(
+            NodeService::instance()->scanDirArray($this->app->getRootPath() . 'vendor/svipchao/cccms-library/src/cccms/config/', []),
+            NodeService::instance()->scanDirArray($this->app->getRootPath() . 'cccms/config/', [])
+        );
         foreach ($configPath as $config) {
             $this->app->config->load($config, pathinfo($config, PATHINFO_FILENAME));
         }
-        // 设置全局中间件
-        $this->app->middleware->import($this->app->config->get('cccms.middleware', []));
-        // 设置异常模板
-        $this->app->config->set([
-            'exception_tmpl' => $this->app->getRootPath() . 'cccms/views/exception.tpl'
-        ], 'app');
-        // 设置Session过期时间
-        $this->app->config->set([
-            'expire' => $this->app->config->get('cccms.session.expire', 86400)
-        ], 'session');
         // 设置数据库指定查询对象
         $database = $this->app->config->get('database', []);
         $database['connections'][$database['default']]['query'] = '\\cccms\\Query';
         $this->app->config->set($database, 'database');
+        // 设置全局中间件
+        $this->app->middleware->import($this->app->config->get('cccms.middleware', []));
         // 设置过滤规则
         $this->app->request->filter(['trim', 'strip_tags', 'htmlspecialchars']);
     }

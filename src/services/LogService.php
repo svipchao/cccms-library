@@ -4,7 +4,7 @@ declare (strict_types=1);
 namespace cccms\services;
 
 use cccms\Service;
-use cccms\model\SysLog;
+use app\admin\model\SysLog;
 
 class LogService extends Service
 {

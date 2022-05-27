@@ -198,7 +198,7 @@ if (!function_exists('_result')) {
             $response = Response::create($data, $type, $code)->options($options);
         } else {
             if ($type === 'view') {
-                $html = app()->getRootPath() . 'cccms/views/result.tpl';
+                $html = config('cccms.resultPath');
             } else {
                 $html = '../app/' . strtolower(app('http')->getName()) . '/view/' . $type . '.html';
             }

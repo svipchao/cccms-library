@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace cccms\services\auth;
 
 use cccms\extend\ArrExtend;
-use cccms\model\SysRole;
 use cccms\services\NodeService;
+use app\admin\model\SysRole;
 
 /**
  * 角色操作

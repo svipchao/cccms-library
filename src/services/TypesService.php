@@ -4,7 +4,7 @@ declare (strict_types=1);
 namespace cccms\services;
 
 use cccms\Service;
-use cccms\model\SysTypes;
+use app\admin\model\SysTypes;
 
 class TypesService extends Service
 {

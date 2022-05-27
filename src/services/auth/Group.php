@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace cccms\services\auth;
 
-use cccms\model\SysGroup;
 use cccms\extend\ArrExtend;
+use app\admin\model\SysGroup;
 
 /**
  * 组织操作

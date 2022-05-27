@@ -4,7 +4,7 @@ declare (strict_types=1);
 namespace cccms;
 
 use think\{App, Container};
-use cccms\model\{SysFile, SysTypes};
+use app\admin\model\{SysFile, SysTypes};
 
 /**
  * 文件存储
