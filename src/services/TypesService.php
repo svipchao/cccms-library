@@ -8,16 +8,9 @@ use app\admin\model\SysTypes;
 
 class TypesService extends Service
 {
-    /**
-     * 判断类别是否正确
-     * @param int|string $id 类别ID
-     * @param int|string $type 分类标识 1:菜单｜2:配置
-     */
-    public function isType(int $id, int $type)
+    public function getAllTypes()
     {
-        if (empty(SysTypes::mk()->where('type', $type)->_read($id))) {
-            _result(['code' => 403, 'msg' => '请选择正确类别'], _getEnCode());
-        }
+        return SysTypes::mk()->field('id,type,name,alias')->cache(600)->_list();
     }
 
     public function getTypesAndWheres(int $type = 0, int $type_id = 0): array
