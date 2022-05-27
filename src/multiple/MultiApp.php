@@ -131,9 +131,10 @@ class MultiApp
                 } elseif ($name && isset($map['*'])) {
                     $appName = $map['*'];
                 } else {
+                    $ds = DIRECTORY_SEPARATOR;
                     $appName = $name ?: $defaultApp;
-                    $appPath = $this->path ?: $this->app->getBasePath() . $appName . DIRECTORY_SEPARATOR;
-                    $appPathLibrary = $this->path ?: $this->app->getRootPath() . 'vendor\\svipchao\\cccms-app\\src\\' . $appName . DIRECTORY_SEPARATOR;
+                    $appPath = $this->path ?: $this->app->getBasePath() . $appName . $ds;
+                    $appPathLibrary = $this->path ?: $this->app->getRootPath() . 'vendor' . $ds . 'svipchao' . $ds . 'cccms-app' . $ds . 'src' . $ds . $appName . $ds;
 
                     if (!is_dir($appPath) && !is_dir($appPathLibrary)) {
                         $express = $this->app->config->get('app.app_express', false);
@@ -184,7 +185,6 @@ class MultiApp
         $this->app->http->name($appName);
 
         $ds = DIRECTORY_SEPARATOR;
-
         $appPath = $this->path ?: $this->app->getBasePath() . $appName . $ds;
 
         $appPathLibrary = $this->path ?: $this->app->getRootPath() . 'vendor/svipchao/cccms-app/src/' . $appName . $ds;
