@@ -1,9 +1,11 @@
 <?php
-declare (strict_types=1);
+
+declare(strict_types=1);
 
 namespace cccms\services\auth;
 
 use think\facade\Db;
+use cccms\model\{SysUser, SysGroup, SysRole};
 use cccms\extend\ArrExtend;
 use cccms\services\NodeService;
 
@@ -29,7 +31,11 @@ trait User
         if (empty($condition) && empty(_getAccessToken('id'))) return [];
         // 这里不要用模型 全局查询会有问题
         $condition = $condition ?: ['id' => _getAccessToken('id')];
-        $userInfo = Db::table('sys_user')->where($condition)->findOrEmpty();
+        if (isset($condition['id']) && $condition['id'] == 1) {
+            $userInfo = SysUser::mk()->_read(1);
+        } else {
+            $userInfo = SysUser::mk()->with(['groups.roles.nodes'])->where($condition)->_read();
+        }
         if (empty($userInfo)) {
             _result(['code' => 401, 'msg' => '账号不存在'], _getEnCode());
         }
@@ -38,23 +44,19 @@ trait User
         }
         $userInfo['admin'] = $userInfo['id'] == 1;
         if ($userInfo['admin']) {
+            $userInfo['groups'] = SysGroup::mk()->field('id,group_id,group_name,group_desc')->_list();
+            $userInfo['roles'] = SysRole::mk()->field('id,role_id,role_name,role_desc')->_list();
             $userInfo['nodes'] = NodeService::instance()->getNodes();
         } else {
-            $userInfo['nodes'] = Db::table('sys_role_node')->alias('role_node')
-                ->join('sys_group_role group_role', 'role_node.role_id = group_role.role_id')
-                ->join('sys_user_group user_group', 'user_group.group_id = group_role.group_id')
-                ->where('user_group.user_id', $userInfo['id'])
-                ->column('node');
+            foreach ($userInfo['groups'] as &$group) {
+                foreach ($group['roles'] as &$role) {
+                    $userInfo['nodes'] = array_merge($userInfo['nodes'] ?? [], array_column($role['nodes'], 'node'));
+                    unset($role['nodes'], $role['status'], $role['create_time'], $role['update_time']);
+                }
+                $userInfo['roles'] = array_merge($userInfo['roles'] ?? [], $group['roles']);
+                unset($group['roles'], $group['status'], $group['create_time'], $group['update_time']);
+            }
         }
-        $userInfo['groups'] = Db::table('sys_group')->alias('group')
-            ->join('sys_user_group user_group', 'user_group.group_id = group.id')
-            ->where('user_group.user_id', $userInfo['id'])
-            ->column('id');
-        $userInfo['roles'] = Db::table('sys_role')->alias('role')
-            ->join('sys_group_role group_role', 'role.id = group_role.role_id')
-            ->join('sys_user_group user_group', 'user_group.group_id = group_role.group_id')
-            ->where('user_group.user_id', $userInfo['id'])
-            ->column('id');
         return $userInfo;
     }
 

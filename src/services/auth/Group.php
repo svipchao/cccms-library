@@ -1,5 +1,6 @@
 <?php
-declare (strict_types=1);
+
+declare(strict_types=1);
 
 namespace cccms\services\auth;
 
@@ -14,11 +15,9 @@ trait Group
     /**
      * 获取全部组织
      */
-    public function getAllGroups(bool $isId = false): array
+    public function getAllGroups(): array
     {
-        $groups = SysGroup::mk()->getGroups();
-        if ($isId) return array_keys($groups);
-        return $groups;
+        return SysGroup::mk()->field('id,group_id,group_name,group_desc')->cache(600)->_list();
     }
 
     /**

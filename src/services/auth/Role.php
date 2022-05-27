@@ -1,5 +1,6 @@
 <?php
-declare (strict_types=1);
+
+declare(strict_types=1);
 
 namespace cccms\services\auth;
 
@@ -17,7 +18,7 @@ trait Role
      */
     public function getAllRoles(): array
     {
-        return SysRole::mk()->getRoles();
+        return SysRole::mk()->field('id,role_id,role_name,role_desc')->cache(600)->_list();
     }
 
     /**
