@@ -1,13 +1,11 @@
 <?php
-
 declare(strict_types=1);
 
 namespace cccms\services\auth;
 
-use think\facade\Db;
-use app\admin\model\{SysUser, SysGroup, SysRole};
 use cccms\extend\ArrExtend;
 use cccms\services\NodeService;
+use app\admin\model\{SysUser, SysGroup, SysRole};
 
 /**
  * 用户操作

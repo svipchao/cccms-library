@@ -7,6 +7,9 @@ use cccms\extend\StrExtend;
 use app\admin\model\SysUserGroup;
 use cccms\services\{AuthService, InitService};
 
+/**
+ * @methods _read()
+ */
 abstract class Model extends \think\Model
 {
     // 定义全局的查询范围
