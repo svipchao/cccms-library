@@ -16,16 +16,6 @@ class SysGroup extends Model
         Cache::delete('SysGroups');
     }
 
-    public function getGroups(): array
-    {
-        $data = Cache::get('SysGroups');
-        if (empty($data)) {
-            $data = $this->column('*', 'id');
-            Cache::set('SysGroups', $data);
-        }
-        return $data;
-    }
-
     public function roles(): belongsToMany
     {
         return $this->belongsToMany(SysRole::class, SysGroupRole::class, 'role_id', 'group_id');

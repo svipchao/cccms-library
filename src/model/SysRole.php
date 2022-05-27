@@ -16,16 +16,6 @@ class SysRole extends Model
         Cache::delete('SysRoles');
     }
 
-    public function getRoles(): array
-    {
-        $data = Cache::get('SysRoles');
-        if (empty($data)) {
-            $data = $this->column('*', 'id');
-            Cache::set('SysRoles', $data);
-        }
-        return $data;
-    }
-
     public function nodes(): HasMany
     {
         return $this->hasMany(SysRoleNode::class, 'role_id', 'id');
