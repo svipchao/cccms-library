@@ -28,7 +28,7 @@ class AuthService extends Service
         if (isset($condition['id']) && $condition['id'] == 1) {
             $userInfo = SysUser::mk()->_read(1);
         } else {
-            $userInfo = SysUser::mk()->with(['groups.roles.nodes'])->where($condition)->_read();
+            $userInfo = SysUser::mk()->with(['loginGroups.roles.nodes'])->where($condition)->_read();
         }
         if (empty($userInfo)) {
             _result(['code' => 401, 'msg' => '账号不存在'], _getEnCode());
@@ -36,13 +36,13 @@ class AuthService extends Service
         if (!$userInfo['status']) {
             _result(['code' => 401, 'msg' => '账号已被禁用'], _getEnCode());
         }
-        $userInfo['admin'] = $userInfo['id'] == 1;
-        if ($userInfo['admin']) {
+        $userInfo = array_merge(['groups' => [], 'roles' => [], 'nodes' => []], $userInfo);
+        if ($userInfo['id'] == 1) {
             $userInfo['groups'] = SysGroup::mk()->field('id,group_id,group_name,group_desc')->_list();
             $userInfo['roles'] = SysRole::mk()->field('id,role_id,role_name,role_desc')->_list();
             $userInfo['nodes'] = NodeService::instance()->getNodes();
         } else {
-            foreach ($userInfo['groups'] as &$group) {
+            foreach ($userInfo['loginGroups'] as &$group) {
                 foreach ($group['roles'] as &$role) {
                     $userInfo['nodes'] = array_merge($userInfo['nodes'] ?? [], array_column($role['nodes'], 'node'));
                     unset($role['nodes'], $role['status'], $role['create_time'], $role['update_time']);
@@ -50,6 +50,8 @@ class AuthService extends Service
                 $userInfo['roles'] = array_merge($userInfo['roles'] ?? [], $group['roles']);
                 unset($group['roles'], $group['status'], $group['create_time'], $group['update_time']);
             }
+            $userInfo['groups'] = $userInfo['loginGroups'];
+            unset($userInfo['loginGroups']);
         }
         return $userInfo;
     }
