@@ -5,10 +5,19 @@ namespace cccms\services;
 
 use cccms\Service;
 use cccms\extend\ArrExtend;
-use app\admin\model\{SysTypes, SysMenu};
+use app\admin\model\SysMenu;
 
 class MenuService extends Service
 {
+    public function getMenus(string $column = ''): array
+    {
+        $menus = SysMenu::mk()->withoutField('create_time,update_time')->cache(600)->_list();
+        if ($column) {
+            $menus = array_column($menus, null, $column);
+        }
+        return $menus;
+    }
+
     /**
      * 根据权限节点生成菜单目录树(所有菜单类别)
      * @param array $nodes 权限节点(键)
@@ -16,7 +25,7 @@ class MenuService extends Service
      */
     public function getTypesMenus(array $nodes = []): array
     {
-        [$types, $menus] = [SysTypes::mk()->getTypes(1, 'id'), SysMenu::mk()->getMenus()];
+        [$types, $menus] = [TypesService::instance()->getTypes(1, 'id'), $this->getMenus()];
         foreach ($menus as $menu) {
             if ($menu['status'] === 0) continue;
             if (isset($types[$menu['type_id']])) {
@@ -46,7 +55,8 @@ class MenuService extends Service
                 $tVal['menus'] = ArrExtend::toTreeArray($tVal['menus'], 'id', 'menu_id');
             }
         }
-        return ArrExtend::toSort($types, 'sort');
+        sort($types);
+        return $types;
     }
 
     /**
@@ -57,7 +67,7 @@ class MenuService extends Service
      */
     public function getTypeMenus($type_id = null, bool $isTree = false): array
     {
-        $menus = SysMenu::mk()->getMenus();
+        $menus = $this->getMenus();
         foreach ($menus as $mKey => &$mVal) {
             if ($type_id && $mVal['type_id'] != $type_id) unset($menus[$mKey]);
         }

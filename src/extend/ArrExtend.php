@@ -121,21 +121,19 @@ class ArrExtend
      * @param string $parentKey 父级主键
      * @return array
      */
-    public static function toChildren(array $array = [], $value = '', bool $withSelf = false, string $currentKey = 'id', string $parentKey = 'pid'): array
+    public static function toChildren(array $array = [], $value = 0, bool $withSelf = false, string $currentKey = 'id', string $parentKey = 'pid'): array
     {
         $arr = [];
-        $value = !is_array($value) ? [$value] : $value;
         foreach ($array as $val) {
-            // 当前主键(父级主键)不存在 || 当前主键等于当前主键值 则跳过
             if (!isset($val[$currentKey])) continue;
-            if (in_array($val[$parentKey], $value)) {
+            if ($val[$parentKey] == $value) {
                 $arr[] = $val;
                 $arr = array_merge($arr, self::toChildren($array, $val[$currentKey], $withSelf, $currentKey, $parentKey));
-            } elseif ($withSelf && in_array($val[$currentKey], $value)) {
+            } elseif ($withSelf && $val[$currentKey] == $value) {
                 $arr[] = $val;
             }
         }
-        return array_column($arr, null, $currentKey);
+        return $arr;
     }
 
     /**
@@ -147,7 +145,7 @@ class ArrExtend
      * @param string $parentKey 父级主键
      * @return array
      */
-    public static function toChildrenIds(array $array = [], $value = '', bool $withSelf = false, string $currentKey = 'id', string $parentKey = 'pid'): array
+    public static function toChildrenIds(array $array = [], $value = 0, bool $withSelf = false, string $currentKey = 'id', string $parentKey = 'pid'): array
     {
         $childrenList = self::toChildren($array, $value, $withSelf, $currentKey, $parentKey);
         $childrenIds = [];

@@ -87,6 +87,18 @@ class AuthService extends Service
     }
 
     /**
+     * 获取角色子集角色(包含自身)
+     * @param int $role_id 角色ID
+     * @param bool $isId 是否返回ID
+     * @return array
+     */
+    public function getRoleChildren(int $role_id = 0, bool $isId = false): array
+    {
+        $roles = ArrExtend::toChildren($this->getAllRoles(), $role_id, true, 'id', 'role_id');
+        return $isId ? array_column($roles, 'id') : $roles;
+    }
+
+    /**
      * 获取用户组织
      * @param bool $isId
      * @param bool $isTree

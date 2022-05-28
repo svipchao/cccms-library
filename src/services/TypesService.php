@@ -8,9 +8,17 @@ use app\admin\model\SysTypes;
 
 class TypesService extends Service
 {
-    public function getAllTypes()
+    public function getTypes(int $type = 0, string $column = ''): array
     {
-        return SysTypes::mk()->field('id,type,name,alias')->cache(600)->_list();
+        if ($type) {
+            $types = SysTypes::mk()->where('type', $type)->field('id,type,name,alias')->cache(600)->_list();
+        } else {
+            $types = SysTypes::mk()->field('id,type,name,alias')->cache(600)->_list();
+        }
+        if ($column) {
+            $types = array_column($types, null, $column);
+        }
+        return $types;
     }
 
     public function getTypesAndWheres(int $type = 0, int $type_id = 0): array
