@@ -82,7 +82,7 @@ class Query extends \think\db\Query
         if (method_exists($query, 'getTableFields')) {
             $fields = $query->getTableFields();
             // 软删除
-            if (in_array('delete_time', $fields)) $data['deleted_time'] = time();
+            if (in_array('delete_time', $fields)) $data['delete_time'] = time();
         }
         return (bool)(empty($data) ? $query->delete() : $query->update($data));
     }
