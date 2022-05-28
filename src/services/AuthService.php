@@ -28,7 +28,7 @@ class AuthService extends Service
         if (isset($condition['id']) && $condition['id'] == 1) {
             $userInfo = SysUser::mk()->_read(1);
         } else {
-            $userInfo = SysUser::mk()->with(['loginGroups.roles.nodes'])->where($condition)->_read();
+            $userInfo = SysUser::mk()->with(['loginGroups.loginRoles.loginNodes'])->where($condition)->_read();
         }
         if (empty($userInfo)) {
             _result(['code' => 401, 'msg' => '账号不存在'], _getEnCode());
@@ -43,12 +43,12 @@ class AuthService extends Service
             $userInfo['nodes'] = NodeService::instance()->getNodes();
         } else {
             foreach ($userInfo['loginGroups'] as &$group) {
-                foreach ($group['roles'] as &$role) {
-                    $userInfo['nodes'] = array_merge($userInfo['nodes'] ?? [], array_column($role['nodes'], 'node'));
-                    unset($role['nodes'], $role['status'], $role['create_time'], $role['update_time']);
+                foreach ($group['loginRoles'] as &$role) {
+                    $userInfo['nodes'] = array_merge($userInfo['nodes'] ?? [], array_column($role['loginNodes'], 'node'));
+                    unset($role['loginNodes'], $role['status'], $role['create_time'], $role['update_time']);
                 }
-                $userInfo['roles'] = array_merge($userInfo['roles'] ?? [], $group['roles']);
-                unset($group['roles'], $group['status'], $group['create_time'], $group['update_time']);
+                $userInfo['roles'] = array_merge($userInfo['roles'] ?? [], $group['loginRoles']);
+                unset($group['loginRoles'], $group['status'], $group['create_time'], $group['update_time']);
             }
             $userInfo['groups'] = $userInfo['loginGroups'];
             unset($userInfo['loginGroups']);
@@ -120,6 +120,18 @@ class AuthService extends Service
         } else {
             return ArrExtend::toTreeList($groups, 'id', 'group_id');
         }
+    }
+
+    /**
+     * 获取组织子集组织(包含自身)
+     * @param int $group_id 组织ID
+     * @param bool $isId 是否返回ID
+     * @return array
+     */
+    public function getGroupChildren(int $group_id = 0, bool $isId = false): array
+    {
+        $groups = ArrExtend::toChildren($this->getAllGroups(), $group_id, true, 'id', 'group_id');
+        return $isId ? array_column($groups, 'id') : $groups;
     }
 
     /**

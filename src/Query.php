@@ -77,6 +77,8 @@ class Query extends \think\db\Query
         if (!$query->getOptions('where')) {
             _result(['code' => 200, 'msg' => '数据删除失败, 请稍候再试！'], _getEnCode());
         }
+        $query = $query->findOrEmpty();
+        if ($query->isEmpty()) return false;
         // 组装执行数据
         $data = [];
         if (method_exists($query, 'getTableFields')) {
