@@ -127,6 +127,7 @@ class ArrExtend
         foreach ($array as $val) {
             if (!isset($val[$currentKey])) continue;
             if ($val[$parentKey] == $value) {
+
                 $arr[] = $val;
                 $arr = array_merge($arr, self::toChildren($array, $val[$currentKey], $withSelf, $currentKey, $parentKey));
             } elseif ($withSelf && $val[$currentKey] == $value) {

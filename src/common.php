@@ -114,7 +114,7 @@ if (!function_exists('_getEnCode')) {
 
 if (!function_exists('_validate')) {
     /**
-     * @param array $params 需要校验的参数
+     * @param string|array $params 需要校验的参数
      * @param string $tableAndFields
      *    格式：表名|必选参数|可选参数
      *    例如：例如：sys_user|username,password|nickname,true
@@ -123,10 +123,14 @@ if (!function_exists('_validate')) {
      * @param array $message 校验的提示信息 与ThinkPHP官方验证器写法一样
      * @return array
      */
-    function _validate(array $params = [], string $tableAndFields = '', array $rule = [], array $message = []): array
+    function _validate($params = '', string $tableAndFields = '', array $rule = [], array $message = []): array
     {
+        $methods = ['param', 'get', 'post', 'put', 'delete', 'session', 'cookie', 'request', 'server', 'env', 'route', 'middleware', 'file', 'all'];
+        if (is_string($params) && in_array($params, $methods)) {
+            $params = request()->$params();
+        }
         if (empty($params)) {
-            _result(['code' => 412, 'msg' => '需要验证的数据无效'], _getEnCode());
+            _result(['code' => 412, 'msg' => '需要验证的数据为空'], _getEnCode());
         }
         if (!empty($tableAndFields)) {
             // 分割字符串
