@@ -38,6 +38,7 @@ abstract class Base extends stdClass
         $this->app = $app;
         $this->request = $this->app->request;
 
+
         // 设置过滤方法
         $this->request->filter(['htmlspecialchars', 'trim']);
 
