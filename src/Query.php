@@ -18,7 +18,13 @@ class Query extends \think\db\Query
     public function _read($data = null, ?callable $callable = null)
     {
         try {
-            $data = $this->model->find($data);
+            if (is_string($data) || is_numeric($data)) {
+                $data = $this->model->find($data);
+            } elseif (is_array($data)) {
+                $data = $this->model->where($data)->find();
+            } else {
+                return [];
+            }
             if (is_callable($callable)) {
                 call_user_func($callable, $data);
             } else {

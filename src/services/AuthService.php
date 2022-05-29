@@ -28,7 +28,7 @@ class AuthService extends Service
         if (isset($condition['id']) && $condition['id'] == 1) {
             $userInfo = SysUser::mk()->_read(1);
         } else {
-            $userInfo = SysUser::mk()->with(['loginGroups.loginRoles.loginNodes'])->where($condition)->_read();
+            $userInfo = SysUser::mk()->with(['loginGroups.loginRoles.loginNodes'])->_read($condition);
         }
         if (empty($userInfo)) {
             _result(['code' => 401, 'msg' => '账号不存在'], _getEnCode());
