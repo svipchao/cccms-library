@@ -12,27 +12,38 @@ class Query extends \think\db\Query
     /**
      * 查找数据
      * @param mixed $data
-     * @param bool $isArray
+     * @param callable|null $callable 回调
      * @return mixed
      */
-    public function _read($data = null, bool $isArray = true)
+    public function _read($data = null, ?callable $callable = null)
     {
-        if ($isArray) {
-            return $this->findOrEmpty($data)->toArray();
-        } else {
-            return $this->findOrEmpty($data);
+        try {
+            $data = $this->model->find($data);
+            if (is_callable($callable)) {
+                call_user_func($callable, $data);
+            } else {
+                $data = $data->toArray();
+            }
+            return $data;
+        } catch (DbException $e) {
+            return [];
         }
     }
 
     /**
      * 数组
-     * @param array $where
+     * @param mixed $where
+     * @param callable|null $callable 回调
      * @return array
      */
-    public function _list(array $where = []): array
+    public function _list($where = null, ?callable $callable = null): array
     {
         try {
-            return $this->where($where)->select()->toArray();
+            return $this->where($where)->select()->each(function ($item) use ($callable) {
+                if (is_callable($callable)) {
+                    call_user_func($callable, $item);
+                }
+            })->toArray();
         } catch (DbException $e) {
             return [];
         }
@@ -43,17 +54,22 @@ class Query extends \think\db\Query
      *    PS:withCache 与分页查询冲突 请不要一起使用
      * @param null $listRows 每页数量 数组表示配置参数
      * @param int|bool $simple 是否简洁模式或者总记录数
-     * @param bool $isArray
+     * @param callable|null $callable 回调
      * @return array|Paginator
      */
-    public function _page($listRows = null, $simple = false, bool $isArray = true)
+    public function _page($listRows = null, $simple = false, ?callable $callable = null)
     {
         try {
-            $res = $this->paginate([
+            $data = $this->paginate([
                 'list_rows' => $listRows['limit'] ?? 15,
                 'page' => $listRows['page'] ?? 1,
             ], $simple);
-            return $isArray ? $res->toArray() : $res;
+            if (is_callable($callable)) {
+                call_user_func($callable, $data);
+            } else {
+                $data = $data->toArray();
+            }
+            return $data;
         } catch (DbException $e) {
             return [];
         }

@@ -10,7 +10,7 @@ use app\admin\model\SysUserGroup;
 
 /**
  * @method mixed _read(mixed $data = null, bool $isArray = true) 查找数据
- * @method array _list(array $where = []) 数组
+ * @method array _list(array $where = [], callable $callable = null) 数组
  * @method array|Paginator _page($listRows = null, $simple = false, bool $isArray = true) 分页查询
  * @method bool _delete(mixed $condition) 快捷删除逻辑器
  */
