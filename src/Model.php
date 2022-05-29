@@ -3,15 +3,14 @@ declare(strict_types=1);
 
 namespace cccms;
 
-use think\Paginator;
 use cccms\extend\StrExtend;
 use cccms\services\{AuthService, InitService};
 use app\admin\model\SysUserGroup;
 
 /**
- * @method mixed _read(mixed $data = null, bool $isArray = true) 查找数据
- * @method array _list(array $where = [], callable $callable = null) 数组
- * @method array|Paginator _page($listRows = null, $simple = false, bool $isArray = true) 分页查询
+ * @method mixed _read(mixed $data = null, callable|null $callable = null) 查找数据
+ * @method array _list(array $where = [], callable|null $callable = null) 数组
+ * @method array _page($listRows = null, $simple = false, callable|null $callable = null) 分页查询
  * @method bool _delete(mixed $condition) 快捷删除逻辑器
  */
 abstract class Model extends \think\Model

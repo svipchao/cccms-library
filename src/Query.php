@@ -45,11 +45,11 @@ class Query extends \think\db\Query
     public function _list($where = null, ?callable $callable = null): array
     {
         try {
-            return $this->where($where)->select()->each(function ($item) use ($callable) {
-                if (is_callable($callable)) {
-                    call_user_func($callable, $item);
-                }
-            })->toArray();
+            $data = $this->where($where)->select()->toArray();
+            if (is_callable($callable)) {
+                $data = array_map($callable, $data);
+            }
+            return $data;
         } catch (DbException $e) {
             return [];
         }
@@ -61,19 +61,17 @@ class Query extends \think\db\Query
      * @param null $listRows 每页数量 数组表示配置参数
      * @param int|bool $simple 是否简洁模式或者总记录数
      * @param callable|null $callable 回调
-     * @return array|Paginator
+     * @return array
      */
-    public function _page($listRows = null, $simple = false, ?callable $callable = null)
+    public function _page($listRows = null, $simple = false, ?callable $callable = null): array
     {
         try {
             $data = $this->paginate([
                 'list_rows' => $listRows['limit'] ?? 15,
                 'page' => $listRows['page'] ?? 1,
-            ], $simple);
+            ], $simple)->toArray();
             if (is_callable($callable)) {
-                call_user_func($callable, $data);
-            } else {
-                $data = $data->toArray();
+                $data = array_map($callable, $data);
             }
             return $data;
         } catch (DbException $e) {
