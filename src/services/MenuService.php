@@ -9,7 +9,7 @@ use app\admin\model\SysMenu;
 
 class MenuService extends Service
 {
-    public function getMenus(string $column = ''): array
+    public function getAllMenus(string $column = ''): array
     {
         $menus = SysMenu::mk()->withoutField('create_time,update_time')->cache(600)->_list();
         if ($column) {
@@ -19,13 +19,26 @@ class MenuService extends Service
     }
 
     /**
+     * 获取菜单子集菜单
+     * @param int $menu_id 菜单ID
+     * @param bool $withSelf 是否包含自身
+     * @param bool $isId 是否返回ID
+     * @return array
+     */
+    public function getMenuChildren(int $menu_id = 0, bool $withSelf = true, bool $isId = false): array
+    {
+        $menu = ArrExtend::toChildren($this->getAllMenus(), $menu_id, $withSelf, 'id', 'menu_id');
+        return $isId ? array_column($menu, 'id') : $menu;
+    }
+
+    /**
      * 根据权限节点生成菜单目录树(所有菜单类别)
      * @param array $nodes 权限节点(键)
      * @return array
      */
     public function getTypesMenus(array $nodes = []): array
     {
-        [$types, $menus] = [TypesService::instance()->getTypes(1, 'id'), $this->getMenus()];
+        [$types, $menus] = [TypesService::instance()->getTypes(1, 'id'), $this->getAllMenus()];
         foreach ($menus as $menu) {
             if ($menu['status'] === 0) continue;
             if (isset($types[$menu['type_id']])) {
@@ -67,7 +80,7 @@ class MenuService extends Service
      */
     public function getTypeMenus($type_id = null, bool $isTree = false): array
     {
-        $menus = $this->getMenus();
+        $menus = $this->getAllMenus();
         foreach ($menus as $mKey => &$mVal) {
             if ($type_id && $mVal['type_id'] != $type_id) unset($menus[$mKey]);
         }

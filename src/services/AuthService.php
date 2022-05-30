@@ -89,14 +89,15 @@ class AuthService extends Service
     }
 
     /**
-     * 获取角色子集角色(包含自身)
+     * 获取角色子集角色
      * @param int $role_id 角色ID
+     * @param bool $withSelf 是否包含自身
      * @param bool $isId 是否返回ID
      * @return array
      */
-    public function getRoleChildren(int $role_id = 0, bool $isId = false): array
+    public function getRoleChildren(int $role_id = 0, bool $withSelf = true, bool $isId = false): array
     {
-        $roles = ArrExtend::toChildren($this->getAllRoles(), $role_id, true, 'id', 'role_id');
+        $roles = ArrExtend::toChildren($this->getAllRoles(), $role_id, $withSelf, 'id', 'role_id');
         return $isId ? array_column($roles, 'id') : $roles;
     }
 
@@ -123,14 +124,15 @@ class AuthService extends Service
     }
 
     /**
-     * 获取组织子集组织(包含自身)
+     * 获取组织子集组织
      * @param int $group_id 组织ID
+     * @param bool $withSelf 是否包含自身
      * @param bool $isId 是否返回ID
      * @return array
      */
-    public function getGroupChildren(int $group_id = 0, bool $isId = false): array
+    public function getGroupChildren(int $group_id = 0, bool $withSelf = true, bool $isId = false): array
     {
-        $groups = ArrExtend::toChildren($this->getAllGroups(), $group_id, true, 'id', 'group_id');
+        $groups = ArrExtend::toChildren($this->getAllGroups(), $group_id, $withSelf, 'id', 'group_id');
         return $isId ? array_column($groups, 'id') : $groups;
     }
 

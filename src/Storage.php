@@ -5,6 +5,7 @@ namespace cccms;
 
 use think\{App, Container};
 use app\admin\model\{SysFile, SysTypes};
+use cccms\services\TypesService;
 
 /**
  * 文件存储
@@ -55,10 +56,8 @@ abstract class Storage
     public function getTypePath(int $type_id = 0): string
     {
         if (empty($type_id)) return '';
-        return SysTypes::mk()->where([
-            ['type', '=', 4],
-            ['id', '=', $type_id]
-        ])->value('alias') ?: '';
+        $types = TypesService::instance()->getTypes(4, 'id');
+        return isset($types[$type_id]) ? $types[$type_id]['alias'] : '';
     }
 
     /**

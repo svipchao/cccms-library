@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0">
-    <title>跳转提示</title>
+    <title><?php echo strip_tags($msg) ?: '页面不存在';?></title>
     <style>
         * {
             padding: 0;
@@ -34,7 +34,7 @@
 <body>
 <div class="system-message">
     {php}echo $code == 200 ? '<h1>:)</h1>' : '<h1>:(</h1>';{/php}
-    <p class="msg"><?php echo(strip_tags($msg));?></p>
+    <p class="msg"><?php echo strip_tags($msg);?></p>
     <a id="href" href="javascript:window.history.go(-1);">返回上一页</a>
 </div>
 </body>
