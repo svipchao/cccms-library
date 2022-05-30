@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace cccms;
 
-use think\Paginator;
 use think\db\exception\DbException;
 use cccms\extend\StrExtend;
 
@@ -19,14 +18,14 @@ class Query extends \think\db\Query
     {
         try {
             if (is_string($data) || is_numeric($data)) {
-                $data = $this->model->find($data);
+                $data = $this->allowEmpty()->find($data);
             } elseif (is_array($data)) {
-                $data = $this->model->where($data)->find();
+                $data = $this->where($data)->allowEmpty()->find();
             } else {
                 return [];
             }
             if (is_callable($callable)) {
-                call_user_func($callable, $data);
+                $data = call_user_func($callable, $data);
             } else {
                 $data = $data->toArray();
             }
