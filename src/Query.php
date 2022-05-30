@@ -71,7 +71,7 @@ class Query extends \think\db\Query
                 'page' => $listRows['page'] ?? 1,
             ], $simple)->toArray();
             if (is_callable($callable)) {
-                $data = array_map($callable, $data);
+                $data['data'] = array_map($callable, $data['data']);
             }
             return $data;
         } catch (DbException $e) {
