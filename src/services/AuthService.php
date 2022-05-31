@@ -95,7 +95,7 @@ class AuthService extends Service
      * @param bool $isId 是否返回ID
      * @return array
      */
-    public function getRoleChildren(int $role_id = 0, bool $withSelf = true, bool $isId = false): array
+    public function getRoleChildren(int $role_id = 0, bool $withSelf = true, bool $isId = true): array
     {
         $roles = ArrExtend::toChildren($this->getAllRoles(), $role_id, $withSelf, 'id', 'role_id');
         return $isId ? array_column($roles, 'id') : $roles;
@@ -130,7 +130,7 @@ class AuthService extends Service
      * @param bool $isId 是否返回ID
      * @return array
      */
-    public function getGroupChildren(int $group_id = 0, bool $withSelf = true, bool $isId = false): array
+    public function getGroupChildren(int $group_id = 0, bool $withSelf = true, bool $isId = true): array
     {
         $groups = ArrExtend::toChildren($this->getAllGroups(), $group_id, $withSelf, 'id', 'group_id');
         return $isId ? array_column($groups, 'id') : $groups;
