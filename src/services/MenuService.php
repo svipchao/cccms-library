@@ -25,7 +25,7 @@ class MenuService extends Service
      * @param bool $isId 是否返回ID
      * @return array
      */
-    public function getMenuChildren(int $menu_id = 0, bool $withSelf = true, bool $isId = false): array
+    public function getMenuChildren(int $menu_id = 0, bool $withSelf = true, bool $isId = true): array
     {
         $menu = ArrExtend::toChildren($this->getAllMenus(), $menu_id, $withSelf, 'id', 'menu_id');
         return $isId ? array_column($menu, 'id') : $menu;
