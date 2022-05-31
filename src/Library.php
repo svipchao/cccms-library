@@ -18,13 +18,15 @@ class Library extends Service
         });
         // 绑定URL类
         $this->app->bind(['think\route\Url' => Url::class]);
-        // 设置配置文件
-        $configPath = array_merge_recursive(
-            NodeService::instance()->scanDirArray($this->app->getRootPath() . 'vendor/svipchao/cccms-library/src/cccms/config/', []),
-            NodeService::instance()->scanDirArray($this->app->getRootPath() . 'cccms/config/', [])
-        );
-        foreach ($configPath as $config) {
-            $this->app->config->load($config, pathinfo($config, PATHINFO_FILENAME));
+        // 设置扩展配置文件
+        $libraryConfigPath = NodeService::instance()->scanDirArray($this->app->getRootPath() . 'vendor/svipchao/cccms-library/src/cccms/config/', []);
+        foreach ($libraryConfigPath as $libraryConfig) {
+            $this->app->config->load($libraryConfig, pathinfo($libraryConfig, PATHINFO_FILENAME));
+        }
+        // 设置用户配置文件
+        $userConfigPath = NodeService::instance()->scanDirArray($this->app->getRootPath() . 'cccms/config/', []);
+        foreach ($userConfigPath as $userConfig) {
+            $this->app->config->load($userConfig, pathinfo($userConfig, PATHINFO_FILENAME));
         }
         // 设置数据库指定查询对象
         $database = $this->app->config->get('database', []);
