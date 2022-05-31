@@ -198,6 +198,8 @@ class MultiApp
         // 设置应用命名空间
         $this->app->setNamespace($this->app->config->get('app.app_namespace') ?: 'app\\' . $appName);
 
+        // 加载公共路由
+        $this->app->http->setRoutePath($this->app->getRootPath() . 'vendor/svipchao/cccms-library/src/cccms/route/');
         if (is_dir($appPath)) {
             $this->app->setRuntimePath($this->app->getRuntimePath() . $appName . DIRECTORY_SEPARATOR);
             $this->app->http->setRoutePath($this->getRoutePath());
@@ -206,7 +208,7 @@ class MultiApp
             $this->loadApp($appName, $appPath);
         }
         // 加载公共路由
-        $this->loadRoutes($this->app->request);
+        // $this->loadRoutes($this->app->request);
     }
 
     // 加载路由
