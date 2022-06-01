@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace cccms;
 
-use think\db\exception\DbException;
 use cccms\extend\StrExtend;
+use think\db\exception\{DbException, DataNotFoundException, ModelNotFoundException};
 
 class Query extends \think\db\Query
 {
@@ -13,26 +13,25 @@ class Query extends \think\db\Query
      * @param mixed $data
      * @param callable|null $callable 回调
      * @return mixed
+     * @throws DbException
+     * @throws DataNotFoundException
+     * @throws ModelNotFoundException
      */
     public function _read($data = null, ?callable $callable = null)
     {
-        try {
-            if (is_string($data) || is_numeric($data)) {
-                $data = $this->allowEmpty()->find($data);
-            } elseif (is_array($data)) {
-                $data = $this->where($data)->allowEmpty()->find();
-            } else {
-                return [];
-            }
-            if (is_callable($callable)) {
-                $data = call_user_func($callable, $data);
-            } else {
-                $data = $data->toArray();
-            }
-            return $data;
-        } catch (DbException $e) {
+        if (is_string($data) || is_numeric($data)) {
+            $data = $this->allowEmpty()->find($data);
+        } elseif (is_array($data)) {
+            $data = $this->where($data)->allowEmpty()->find();
+        } else {
             return [];
         }
+        if (is_callable($callable)) {
+            $data = call_user_func($callable, $data);
+        } else {
+            $data = $data->toArray();
+        }
+        return $data;
     }
 
     /**
@@ -40,18 +39,17 @@ class Query extends \think\db\Query
      * @param mixed $where
      * @param callable|null $callable 回调
      * @return array
+     * @throws DataNotFoundException
+     * @throws DbException
+     * @throws ModelNotFoundException
      */
     public function _list($where = null, ?callable $callable = null): array
     {
-        try {
-            $data = $this->where($where)->select()->toArray();
-            if (is_callable($callable)) {
-                $data = array_map($callable, $data);
-            }
-            return $data;
-        } catch (DbException $e) {
-            return [];
+        $data = $this->where($where)->select()->toArray();
+        if (is_callable($callable)) {
+            $data = array_map($callable, $data);
         }
+        return $data;
     }
 
     /**
@@ -61,21 +59,18 @@ class Query extends \think\db\Query
      * @param int|bool $simple 是否简洁模式或者总记录数
      * @param callable|null $callable 回调
      * @return array
+     * @throws DbException
      */
     public function _page($listRows = null, $simple = false, ?callable $callable = null): array
     {
-        try {
-            $data = $this->paginate([
-                'list_rows' => $listRows['limit'] ?? 15,
-                'page' => $listRows['page'] ?? 1,
-            ], $simple)->toArray();
-            if (is_callable($callable)) {
-                $data['data'] = array_map($callable, $data['data']);
-            }
-            return $data;
-        } catch (DbException $e) {
-            return [];
+        $data = $this->paginate([
+            'list_rows' => $listRows['limit'] ?? 15,
+            'page' => $listRows['page'] ?? 1,
+        ], $simple)->toArray();
+        if (is_callable($callable)) {
+            $data['data'] = array_map($callable, $data['data']);
         }
+        return $data;
     }
 
     /**
