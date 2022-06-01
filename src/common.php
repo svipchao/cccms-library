@@ -171,12 +171,10 @@ if (!function_exists('_validate')) {
             }
             // 销毁额外数据
             $params = array_intersect_key($params, array_flip($optionalParams));
-            // 获取系统生成的验证规则
-            // 取出验证规则键 不能获取交集 表字段必须录入的数据会被绕过
-            // $ruleField = array_intersect_key($tableInfo['fields'], $params);
+            // 获取系统生成的验证规则 必须存在的参数需在 $tableAndFields 中配置 这里只验证传进来的参数
+            $ruleField = array_intersect_key($tableInfo['fields'], $params);
             // 取出验证规则
-            // $rule = array_merge(array_intersect_key($tableInfo['rules'], array_flip($ruleField)), $rule);
-            $rule = array_merge(array_intersect_key($tableInfo['rules'], array_flip($tableInfo['fields'])), $rule);
+            $rule = array_merge(array_intersect_key($tableInfo['rules'], array_flip($ruleField)), $rule);
         }
         // 验证
         $validate = new Validate;
