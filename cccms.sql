@@ -7,7 +7,7 @@ CREATE TABLE `sys_user`
     `avatar`      varchar(50)  NOT NULL DEFAULT '' COMMENT '头像(length:1,50)',
     `intro`       varchar(255) NOT NULL DEFAULT '' COMMENT '简介(length:1,255)',
     `token`       char(32)     NOT NULL DEFAULT '' COMMENT 'Token(alphaNum|length:32)',
-    `type`        tinyint      NOT NULL DEFAULT 1 COMMENT '类型(in:0,1|length:1)【0:用户,1:会员】',
+    `type`        tinyint      NOT NULL DEFAULT 1 COMMENT '类型(in:0,1|length:1)',
     `status`      tinyint      NOT NULL DEFAULT 1 COMMENT '状态(in:0,1|length:1)【0:禁用,1:正常】',
     `create_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
