@@ -197,7 +197,7 @@ if (!function_exists('_validate')) {
         if (!$validate->rule($rule)->message($message)->check($params)) {
             _result(['code' => 412, 'msg' => $validate->getError()], _getEnCode()); // 先决条件错误
         }
-        return $params;
+        return array_merge($mergeParams ?? [], $params);
     }
 }
 
