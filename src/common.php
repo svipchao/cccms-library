@@ -183,8 +183,10 @@ if (!function_exists('_validate')) {
                 // 获取表字段信息
                 _result(['code' => 412, 'msg' => '必须存在参数：' . join(',', array_intersect_key($fieldInfo, $requireParamsDiff))], _getEnCode());
             }
+            // 合并参数
+            $mergeParams = array_merge($requireParams, $optionalParams);
             // 销毁额外数据
-            $params = array_intersect_key($params, $optionalParams);
+            $params = array_intersect_key($params, $mergeParams);
             // 获取系统生成的验证规则 必须存在的参数需在 $filterParams 中配置 这里只验证传进来的参数
             $ruleField = array_intersect_key($tableInfo['fields'], $params);
             // 取出验证规则
@@ -195,7 +197,6 @@ if (!function_exists('_validate')) {
         if (!$validate->rule($rule)->message($message)->check($params)) {
             _result(['code' => 412, 'msg' => $validate->getError()], _getEnCode()); // 先决条件错误
         }
-        // return array_merge($optionalParams ?? [], $params);
         return $params;
     }
 }
