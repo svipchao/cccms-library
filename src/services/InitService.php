@@ -58,31 +58,25 @@ class InitService extends Service
                 $fields = Db::getFields($table['Name']);
                 foreach ($fields as $key => $val) {
                     $rule = [];
+                    if ($val['notnull']) $rule[] = 'require';
                     // 移除用户自定义注释内容
                     $val['comment'] = preg_replace("/(?=【).*?(?<=】)/", '', $val['comment']);
-
                     // 没有字段备注的时候使用字段名
                     $val['comment'] = $val['comment'] ?: $val['name'];
-
                     // 判断类型 没有括号的时候 返回当前类型
                     if (strstr($val['type'], 'int')) $rule[] = 'number';
-
                     // 设置长度
                     preg_match("/(?<=\().*?(?=\))/", $val['type'], $length);
                     if (!empty($length)) $rule[] = 'length:1,' . (int)$length[0];
-
                     // 读取扩展验证
                     preg_match("/(?<=\().*?(?=\))/", $val['comment'], $comment);
                     if (!empty($comment)) {
                         // 判断生成的验证是否和用户自定义规则冲突
                         if (strstr($comment[0], 'length')) unset($rule['length']);
                         $comment = explode('|', $comment[0]);
-                        // 由于数据库优化 字段有默认值 所以验证规则可为空
-                        // 判断是否可以为空
-                        if (!in_array('noRequire', $comment) && $val['notnull']) {
-                            $rule[] = 'require';
-                        }
+                        // 字段有默认值 所以验证规则可为空
                         if (in_array('noRequire', $comment)) {
+                            unset($comment[array_search('require', $comment)]);
                             unset($comment[array_search('noRequire', $comment)]);
                         }
                         $rule = array_merge($comment, $rule);
