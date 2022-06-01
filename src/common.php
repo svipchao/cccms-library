@@ -115,7 +115,7 @@ if (!function_exists('_getEnCode')) {
 if (!function_exists('_validate')) {
     /**
      * @param string|array $params 需要校验的参数
-     * @param string $tableAndFields
+     * @param string|array|null $filterParams
      *    格式：表名|必选参数|可选参数
      *    例如：例如：sys_user|username,password|nickname,true
      *    PS：可选参数内如果包含 true 则包含表的其他字段，默认可选参数与必选参数会合并处理，不需要写两遍
@@ -123,43 +123,57 @@ if (!function_exists('_validate')) {
      * @param array $message 校验的提示信息 与ThinkPHP官方验证器写法一样
      * @return array
      */
-    function _validate($params = '', string $tableAndFields = '', array $rule = [], array $message = []): array
+    function _validate($params = '', $filterParams = null, array $rule = [], array $message = []): array
     {
-        $methods = ['param', 'get', 'post', 'put', 'delete', 'session', 'cookie', 'request', 'server', 'env', 'route', 'middleware', 'file', 'all'];
-        if (is_string($params) && in_array($params, $methods)) {
+        if (is_string($params) && method_exists(request(), $params)) {
             $params = request()->$params();
         }
         if (empty($params)) {
             _result(['code' => 412, 'msg' => '需要验证的数据为空'], _getEnCode());
         }
-        if (!empty($tableAndFields)) {
-            // 分割字符串
-            $tableAndFields = explode('|', $tableAndFields);
-            // 表名 , 必选参数 , 可选参数
-            [$tableName, $requireParams, $optionalParams] = [
-                $tableAndFields[0] ?? '',
-                array_filter(explode(',', $tableAndFields[1] ?? '')),
-                array_filter(explode(',', ($tableAndFields[1] ?? '') . ',' . ($tableAndFields[2] ?? '')))
-            ];
+        if (!empty($filterParams)) {
+            [$tableName, $requireParams, $optionalParams] = array_pad([], 3, '');
+            if (is_string($filterParams)) {
+                [$tableName, $requireParams, $optionalParams] = array_pad(explode('|', $filterParams), 3, "");
+            } elseif (is_array($filterParams)) {
+                [$tableName, $requireParams, $optionalParams] = array_pad($filterParams, 3, "");
+            }
+            if (is_string($requireParams)) {
+                $requireParams = array_filter(explode(',', $requireParams));
+            }
+            if (is_string($optionalParams)) {
+                $optionalParams = array_filter(explode(',', $optionalParams));
+            }
+            foreach ($requireParams as $key => $value) {
+                if (is_int($key)) {
+                    unset($requireParams[$key]);
+                    $requireParams[$value] = '';
+                }
+            }
+            foreach ($optionalParams as $key => $value) {
+                if (is_int($key)) {
+                    unset($optionalParams[$key]);
+                    $optionalParams[$value] = '';
+                }
+            }
             // 获取全部表字段信息
-            $tablesInfo = cache('Tables');
+            $tables = cache('Tables');
             // 表信息
-            $tableInfo = $tablesInfo[StrExtend::humpToUnderline($tableName)] ?? null;
+            $tableInfo = $tables[StrExtend::humpToUnderline($tableName)] ?? null;
             if (empty($tableInfo)) {
                 _result(['code' => 412, 'msg' => '表不存在'], _getEnCode());
             }
             // 判断是否包含表字段
-            if (in_array('true', $optionalParams) && isset($tableInfo['fields'])) {
-                array_push($optionalParams, ...array_keys($tableInfo['fields']));
-                // 去重
-                $optionalParams = array_keys(array_flip($optionalParams));
+            if (isset($optionalParams['true']) && isset($tableInfo['fields'])) {
+                unset($optionalParams['true']);
+                $optionalParams = array_merge($optionalParams, array_flip(array_keys($tableInfo['fields'])));
             }
             // 必选参数和可选参数都为空就没必要往下执行了
             if (empty($requireParams) && empty($optionalParams)) {
                 _result(['code' => 412, 'msg' => '需要验证的字段无效'], _getEnCode());
             }
             // 判断必须存在的数据是否存在
-            $requireParamsDiff = array_diff_key(array_flip($requireParams), $params);
+            $requireParamsDiff = array_diff_key($requireParams, $params);
             if (!empty($requireParamsDiff)) {
                 $fieldInfo = [];
                 foreach ($tableInfo['fields'] as $fields) {
@@ -170,8 +184,8 @@ if (!function_exists('_validate')) {
                 _result(['code' => 412, 'msg' => '必须存在参数：' . join(',', array_intersect_key($fieldInfo, $requireParamsDiff))], _getEnCode());
             }
             // 销毁额外数据
-            $params = array_intersect_key($params, array_flip($optionalParams));
-            // 获取系统生成的验证规则 必须存在的参数需在 $tableAndFields 中配置 这里只验证传进来的参数
+            $params = array_intersect_key($params, $optionalParams);
+            // 获取系统生成的验证规则 必须存在的参数需在 $filterParams 中配置 这里只验证传进来的参数
             $ruleField = array_intersect_key($tableInfo['fields'], $params);
             // 取出验证规则
             $rule = array_merge(array_intersect_key($tableInfo['rules'], array_flip($ruleField)), $rule);
