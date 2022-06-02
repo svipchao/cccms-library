@@ -76,7 +76,7 @@ class InitService extends Service
                         $comment = explode('|', $comment[0]);
                         // 字段有默认值 所以验证规则可为空
                         if (in_array('noRequire', $comment)) {
-                            unset($comment[array_search('require', $comment)]);
+                            unset($rule[array_search('require', $rule)]);
                             unset($comment[array_search('noRequire', $comment)]);
                         }
                         $rule = array_merge($comment, $rule);
