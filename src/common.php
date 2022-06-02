@@ -116,9 +116,10 @@ if (!function_exists('_validate')) {
     /**
      * @param string|array $params 需要校验的参数
      * @param string|array|null $filterParams
-     *    格式：表名|必选参数|可选参数
+     *    格式：表名|必选参数|可选参数|额外参数
      *    例如：例如：sys_user|username,password|nickname,true
      *    PS：可选参数内如果包含 true 则包含表的其他字段，默认可选参数与必选参数会合并处理，不需要写两遍
+     *        额外参数仅仅是方便返回自定义数据，并不参与验证等操作
      * @param array $rule 校验的规则 与ThinkPHP官方验证器写法一样
      * @param array $message 校验的提示信息 与ThinkPHP官方验证器写法一样
      * @return array
@@ -132,30 +133,34 @@ if (!function_exists('_validate')) {
             _result(['code' => 412, 'msg' => '需要验证的数据为空'], _getEnCode());
         }
         if (!empty($filterParams)) {
-            [$tableName, $requireParams, $optionalParams] = array_pad([], 3, '');
+            [$tableName, $requireParams, $optionalParams, $extraParams] = array_pad([], 4, '');
             if (is_string($filterParams)) {
-                [$tableName, $requireParams, $optionalParams] = array_pad(explode('|', $filterParams), 3, "");
+                [$tableName, $requireParams, $optionalParams, $extraParams] = array_pad(explode('|', $filterParams), 4, "");
             } elseif (is_array($filterParams)) {
-                [$tableName, $requireParams, $optionalParams] = array_pad($filterParams, 3, "");
+                [$tableName, $requireParams, $optionalParams, $extraParams] = array_pad($filterParams, 4, "");
             }
-            if (is_string($requireParams)) {
-                $requireParams = array_filter(explode(',', $requireParams));
-            }
-            if (is_string($optionalParams)) {
-                $optionalParams = array_filter(explode(',', $optionalParams));
-            }
-            foreach ($requireParams as $key => $value) {
-                if (is_int($key)) {
-                    unset($requireParams[$key]);
-                    $requireParams[$value] = '';
+
+            function handleParams($params)
+            {
+                if (is_string($params)) {
+                    $params = array_filter(explode(',', $params));
                 }
-            }
-            foreach ($optionalParams as $key => $value) {
-                if (is_int($key)) {
-                    unset($optionalParams[$key]);
-                    $optionalParams[$value] = '';
+                foreach ($params as $key => $value) {
+                    if (is_int($key)) {
+                        unset($params[$key]);
+                        $params[$value] = '';
+                    }
                 }
+                return $params;
             }
+
+            [$requireParams, $optionalParams, $extraParams] = [
+                handleParams($requireParams),
+                handleParams($optionalParams),
+                handleParams($extraParams)
+            ];
+            $extraParams = array_merge($extraParams ?? [], $params);
+
             // 获取全部表字段信息
             $tables = cache('Tables');
             // 表信息
@@ -200,7 +205,7 @@ if (!function_exists('_validate')) {
         if (!$validate->rule($rule)->message($message)->check($params)) {
             _result(['code' => 412, 'msg' => $validate->getError()], _getEnCode()); // 先决条件错误
         }
-        return array_merge($mergeParams ?? [], $params);
+        return array_merge($extraParams ?? [], $params);
     }
 }
 

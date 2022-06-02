@@ -5,6 +5,7 @@ namespace cccms;
 
 use cccms\extend\StrExtend;
 use cccms\services\{AuthService, InitService};
+use app\admin\model\SysUser;
 use app\admin\model\SysUserGroup;
 
 /**
@@ -49,18 +50,34 @@ abstract class Model extends \think\Model
     // 数据权限
     public function scopeAuth($query, int $user_id = 0)
     {
+        /**
+         * 管理员 不为空 取user_id数据
+         * 用户 不为空 判断是否有相同角色 有 则取 user_id 数据 否则取自己的数据
+         * 管理员 为空 不加条件，取全部数据
+         * 用户 为空 取自己的数据
+         */
         // 判断表字段是否存在用户ID
-        $tableFields = $query->getFields();
         $tableName = $query->getTable();
         $field = $tableName === 'sys_user' ? 'id' : 'user_id';
-        if (!AuthService::instance()->isAdmin() && (isset($tableFields['user_id']) || $tableName === 'sys_user')) {
-            // 传进来的用户角色
-            $groupIds = SysUserGroup::mk()->where('user_id', $user_id)->column('group_id');
-            // 取并集 与当前登录用户存在相同角色则允许 否则查找当前登录用户数据
-            if (empty(array_intersect($groupIds, AuthService::instance()->getUserGroups(true)))) {
-                $user_id = _getAccessToken('id');
+        if (empty($user_id)) {
+            if (!AuthService::instance()->isAdmin()) {
+                $query->where($field, AuthService::instance()->getUserInfo('id'));
             }
-            $query->where($field, $user_id);
+        } else {
+            $tableFields = $query->getFields();
+            if (AuthService::instance()->isAdmin()) {
+                $query->where('id', $user_id);
+            } elseif (isset($tableFields['user_id']) || $tableName === 'sys_user') {
+                // 传进来的用户角色
+                $group_ids = SysUser::mk()->with('groups')->_read($user_id, function ($data) {
+                    return $data->groups->column('id');
+                });
+                // 取并集 与当前登录用户存在相同角色则允许 否则查找当前登录用户数据
+                if (empty(array_intersect($group_ids, AuthService::instance()->getUserGroups(true)))) {
+                    $user_id = _getAccessToken('id');
+                }
+                $query->where($field, $user_id);
+            }
         }
     }
 }

@@ -139,6 +139,15 @@ class AuthService extends Service
     }
 
     /**
+     * 获取用户权限节点
+     *
+     */
+    public function getUserNodes()
+    {
+        return $this->getUserInfo('nodes');
+    }
+
+    /**
      * 判断是否是管理员
      * @return bool
      */
