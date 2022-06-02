@@ -76,7 +76,8 @@ class AuthService extends Service
     {
         $roles = $this->getAllRoles();
         if (!$this->isAdmin()) {
-            $roles = ArrExtend::toChildren($roles, $this->getUserInfo('roles'), true, 'id', 'role_id');
+            $role_ids = array_column($this->getUserInfo('roles'), 'id');
+            $roles = ArrExtend::toChildren($roles, $role_ids, true, 'id', 'role_id');
         }
         if ($isId) {
             return array_column($roles, 'id');
@@ -111,7 +112,8 @@ class AuthService extends Service
     {
         $groups = $this->getAllGroups();
         if (!$this->isAdmin()) {
-            $groups = ArrExtend::toChildren($groups, $this->getUserInfo('groups'), true, 'id', 'group_id');
+            $group_ids = array_column($this->getUserInfo('groups'), 'id');
+            $groups = ArrExtend::toChildren($groups, $group_ids, true, 'id', 'group_id');
         }
         if ($isId) {
             return array_column($groups, 'id');

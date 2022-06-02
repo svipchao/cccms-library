@@ -121,20 +121,20 @@ class ArrExtend
      * @param string $parentKey 父级主键
      * @return array
      */
-    public static function toChildren(array $array = [], $value = 0, bool $withSelf = false, string $currentKey = 'id', string $parentKey = 'pid'): array
+    public static function toChildren(array $array = [], $value = null, bool $withSelf = false, string $currentKey = 'id', string $parentKey = 'pid'): array
     {
         $arr = [];
+        if (!is_array($value)) $value = [$value];
         foreach ($array as $val) {
             if (!isset($val[$currentKey])) continue;
-            if ($val[$parentKey] == $value) {
-
+            if (in_array($val[$parentKey], $value)) {
                 $arr[] = $val;
                 $arr = array_merge($arr, self::toChildren($array, $val[$currentKey], $withSelf, $currentKey, $parentKey));
-            } elseif ($withSelf && $val[$currentKey] == $value) {
+            } elseif ($withSelf && in_array($val[$currentKey], $value)) {
                 $arr[] = $val;
             }
         }
-        return $arr;
+        return array_unique($arr, SORT_REGULAR);
     }
 
     /**

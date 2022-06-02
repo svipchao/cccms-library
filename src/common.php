@@ -166,7 +166,10 @@ if (!function_exists('_validate')) {
             // 判断是否包含表字段
             if (isset($optionalParams['true']) && isset($tableInfo['fields'])) {
                 unset($optionalParams['true']);
-                $optionalParams = array_merge($optionalParams, array_flip(array_keys($tableInfo['fields'])));
+                // 将字段默认值重置为空
+                $optionalParams = array_merge($optionalParams, array_map(function () {
+                    return null;
+                }, array_flip(array_keys($tableInfo['fields']))));
             }
             // 必选参数和可选参数都为空就没必要往下执行了
             if (empty($requireParams) && empty($optionalParams)) {
