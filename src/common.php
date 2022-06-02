@@ -159,22 +159,23 @@ if (!function_exists('_validate')) {
                 handleParams($optionalParams),
                 handleParams($extraParams)
             ];
-            $extraParams = array_merge($extraParams ?? [], $params);
+            // 额外参数重新赋值
+            $extraParams = array_replace($extraParams, array_intersect_key($params, $extraParams));
 
             // 获取全部表字段信息
             $tables = cache('Tables');
+            halt($tables);
             // 表信息
             $tableInfo = $tables[StrExtend::humpToUnderline($tableName)] ?? null;
             if (empty($tableInfo)) {
                 _result(['code' => 412, 'msg' => '表不存在'], _getEnCode());
             }
-            // 判断是否包含表字段
+            // 判断可选参数是否包含表字段
             if (isset($optionalParams['true']) && isset($tableInfo['fields'])) {
                 unset($optionalParams['true']);
+                $tableFields = array_keys($tableInfo['fields']);
                 // 将字段默认值重置为空
-                $optionalParams = array_merge($optionalParams, array_map(function ($value) {
-                    return null;
-                }, array_flip(array_keys($tableInfo['fields']))));
+                $optionalParams = array_merge(array_fill_keys($tableFields, null), $optionalParams);
             }
             // 必选参数和可选参数都为空就没必要往下执行了
             if (empty($requireParams) && empty($optionalParams)) {
@@ -183,11 +184,15 @@ if (!function_exists('_validate')) {
             // 判断必须存在的数据是否存在
             $requireParamsDiff = array_diff_key($requireParams, $params);
             if (!empty($requireParamsDiff)) {
-                $fieldInfo = [];
-                foreach ($tableInfo['fields'] as $fields) {
-                    $fields = explode('|', $fields);
-                    $fieldInfo[$fields[0]] = $fields[1] ?? '未知参数';
+                $tableFields = array_intersect_key($tableInfo['fields'], $requireParamsDiff);
+                $requireParamsDiff = array_replace($requireParamsDiff, $tableFields);
+                $requireParamsMsg = '';
+                foreach ($requireParamsDiff as $diffKey => $diff) {
+                    $diff = explode('|', $diff);
+                    $fieldInfo[$diffKey] = $diff[1] ?? '未知参数';
+                    $requireParamsMsg .= $diffKey . ',';
                 }
+                halt($fieldInfo);
                 // 获取表字段信息
                 _result(['code' => 412, 'msg' => '必须存在参数：' . join(',', array_intersect_key($fieldInfo, $requireParamsDiff))], _getEnCode());
             }
