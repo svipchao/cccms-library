@@ -167,7 +167,7 @@ if (!function_exists('_validate')) {
             if (isset($optionalParams['true']) && isset($tableInfo['fields'])) {
                 unset($optionalParams['true']);
                 // 将字段默认值重置为空
-                $optionalParams = array_merge($optionalParams, array_map(function () {
+                $optionalParams = array_merge($optionalParams, array_map(function ($value) {
                     return null;
                 }, array_flip(array_keys($tableInfo['fields']))));
             }
