@@ -37,11 +37,6 @@ class TableService extends Service
         $tableInfo = InitService::instance()->getTables()[$tableName] ?? [];
         $tableFields = $tableInfo['fields'] ?: [];
         // 取差集 管理员可以操作任何信息 这里严格意义上来说不能判断是否管理员 待商议
-        $res = AuthService::instance()->isAdmin() ? $tableFields : array_diff_key($tableFields, array_flip($fields));
-        // 字段为键 字段名为值
-        foreach ($res as $key => &$val) {
-            $val = explode('|', $val)[1] ?? $key;
-        }
-        return $res;
+        return AuthService::instance()->isAdmin() ? $tableFields : array_diff_key($tableFields, array_flip($fields));
     }
 }

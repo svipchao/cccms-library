@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use think\{Response, Validate};
+use cccms\services\InitService;
 use cccms\extend\{StrExtend, JwtExtend};
 
 if (!function_exists('_config')) {
@@ -163,8 +164,7 @@ if (!function_exists('_validate')) {
             $extraParams = array_replace($extraParams, array_intersect_key($params, $extraParams));
 
             // 获取全部表字段信息
-            $tables = cache('Tables');
-            halt($tables);
+            $tables = InitService::instance()->getTables();
             // 表信息
             $tableInfo = $tables[StrExtend::humpToUnderline($tableName)] ?? null;
             if (empty($tableInfo)) {
@@ -186,6 +186,8 @@ if (!function_exists('_validate')) {
             if (!empty($requireParamsDiff)) {
                 $tableFields = array_intersect_key($tableInfo['fields'], $requireParamsDiff);
                 $requireParamsDiff = array_replace($requireParamsDiff, $tableFields);
+                dump($requireParamsDiff);
+                halt($tableFields);
                 $requireParamsMsg = '';
                 foreach ($requireParamsDiff as $diffKey => $diff) {
                     $diff = explode('|', $diff);

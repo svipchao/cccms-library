@@ -84,7 +84,8 @@ class InitService extends Service
                     // 给字段设置中文名
                     $val['comment_new'] = strstr($val['comment'], '(', true) ?: $val['comment'];
                     // 设置映射字段
-                    $data[$table['Name']]['fields'][$key] = $key . '|' . $val['comment_new'];
+                    $data[$table['Name']]['fields'][$key] = $val['comment_new'];
+                    $data[$table['Name']]['ruleAlias'][$key] = $key . '|' . $val['comment_new'];
                     // 规则为空则不设置规则
                     if (empty($rule)) continue;
                     $data[$table['Name']]['rules'][$key . '|' . $val['comment_new']] = implode('|', $rule);
