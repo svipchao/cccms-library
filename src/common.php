@@ -143,11 +143,12 @@ if (!function_exists('_validate')) {
 
             function handleParams($params)
             {
+                if (empty($params)) return [];
                 if (is_string($params)) $params = explode(',', $params);
                 foreach ($params as $key => $value) {
                     if (is_int($key)) {
                         unset($params[$key]);
-                        $params[$value] = '';
+                        $params[$value] = 0;
                     }
                 }
                 return $params;
@@ -176,9 +177,9 @@ if (!function_exists('_validate')) {
                 $optionalParams = array_merge(array_fill_keys($tableFields, null), $optionalParams);
             }
             // 必选参数和可选参数都为空就没必要往下执行了
-            if (empty($requireParams) && empty($optionalParams)) {
-                _result(['code' => 412, 'msg' => '需要验证的字段无效'], _getEnCode());
-            }
+            // if (empty($requireParams) && empty($optionalParams)) {
+                // _result(['code' => 412, 'msg' => '需要验证的字段无效'], _getEnCode());
+            // }
             // 判断必须存在的数据是否存在
             $requireParamsDiff = array_diff_key($requireParams, $params);
             if (!empty($requireParamsDiff)) {
