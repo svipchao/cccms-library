@@ -143,9 +143,7 @@ if (!function_exists('_validate')) {
 
             function handleParams($params)
             {
-                if (is_string($params)) {
-                    $params = array_filter(explode(',', $params));
-                }
+                if (is_string($params)) $params = explode(',', $params);
                 foreach ($params as $key => $value) {
                     if (is_int($key)) {
                         unset($params[$key]);
@@ -186,17 +184,10 @@ if (!function_exists('_validate')) {
             if (!empty($requireParamsDiff)) {
                 $tableFields = array_intersect_key($tableInfo['fields'], $requireParamsDiff);
                 $requireParamsDiff = array_replace($requireParamsDiff, $tableFields);
-                dump($requireParamsDiff);
-                halt($tableFields);
-                $requireParamsMsg = '';
-                foreach ($requireParamsDiff as $diffKey => $diff) {
-                    $diff = explode('|', $diff);
-                    $fieldInfo[$diffKey] = $diff[1] ?? '未知参数';
-                    $requireParamsMsg .= $diffKey . ',';
+                foreach ($requireParamsDiff as $key => &$val) {
+                    $val = ($val ?: '未知参数') . '(' . $key . ')';
                 }
-                halt($fieldInfo);
-                // 获取表字段信息
-                _result(['code' => 412, 'msg' => '必须存在参数：' . join(',', array_intersect_key($fieldInfo, $requireParamsDiff))], _getEnCode());
+                _result(['code' => 412, 'msg' => '必须存在参数：' . implode(',', $requireParamsDiff)], _getEnCode());
             }
             // 合并参数
             $mergeParams = array_merge($requireParams, $optionalParams);
