@@ -191,7 +191,7 @@ if (!function_exists('_validate')) {
             // 销毁额外数据
             $params = array_intersect_key($params, $mergeParams);
             // 获取系统生成的验证规则 必须存在的参数需在 $filterParams 中配置 这里只验证传进来的参数
-            $ruleField = array_intersect_key($tableInfo['fields'], $params);
+            $ruleField = array_intersect_key($tableInfo['ruleAlias'], $params);
             // 取出验证规则
             $rule = array_merge(array_intersect_key($tableInfo['rules'], array_flip($ruleField)), $rule);
         }
