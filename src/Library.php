@@ -34,6 +34,7 @@ class Library extends Service
         // 设置数据库指定查询对象
         $database = $this->app->config->get('database', []);
         $database['connections'][$database['default']]['query'] = '\\cccms\\Query';
+        $database['connections'][$database['default']]['fields_cache'] = true;
         $this->app->config->set($database, 'database');
         // 设置全局中间件
         $this->app->middleware->import($this->app->config->get('cccms.middleware', []));

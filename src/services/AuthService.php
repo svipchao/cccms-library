@@ -26,9 +26,10 @@ class AuthService extends Service
         if (empty($condition) && empty(_getAccessToken('id'))) return [];
         $condition = $condition ?: ['id' => _getAccessToken('id')];
         if (isset($condition['id']) && $condition['id'] == 1) {
-            $userInfo = SysUser::mk()->_read(1);
+            $userInfo = SysUser::mk([], false)->cache()->_read(1);
         } else {
-            $userInfo = SysUser::mk()->with(['loginGroups.loginRoles.loginNodes'])->_read($condition);
+            $userInfo = SysUser::mk([], false)->with(['loginGroups.loginRoles.loginNodes'])
+                ->withCache()->cache()->_read($condition);
         }
         if (empty($userInfo)) {
             _result(['code' => 401, 'msg' => '账号不存在'], _getEnCode());
@@ -38,8 +39,10 @@ class AuthService extends Service
         }
         $userInfo = array_merge(['groups' => [], 'roles' => [], 'nodes' => []], $userInfo);
         if ($userInfo['id'] == 1) {
-            $userInfo['groups'] = SysGroup::mk()->field('id,group_id,group_name,group_desc')->_list();
-            $userInfo['roles'] = SysRole::mk()->field('id,role_id,role_name,role_desc')->_list();
+            $userInfo['groups'] = SysGroup::mk([], false)->cache()
+                ->field('id,group_id,group_name,group_desc')->_list();
+            $userInfo['roles'] = SysRole::mk([], false)->cache()
+                ->field('id,role_id,role_name,role_desc')->_list();
             $userInfo['nodes'] = NodeService::instance()->getNodes();
         } else {
             foreach ($userInfo['loginGroups'] as &$group) {

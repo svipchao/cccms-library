@@ -16,23 +16,26 @@ use app\admin\model\SysUser;
  */
 abstract class Model extends \think\Model
 {
-    // 定义全局的查询范围
-    protected $globalScope = ['field'];
-
     /**
      * 创建模型实例
      * @return static
      */
-    public static function mk($data = []): Model
+    public static function mk($data = [], $isScope = true): Model
     {
-        return new static($data);
+        $model = new static($data);
+        if (!$isScope) {
+            $model->scope([]);
+        } else {
+            $model->scope(['field']);
+        }
+        return $model;
     }
 
     // 字段权限
     public function scopeField($query)
     {
         $data = InitService::instance()->getData();
-        $tableInfo = $data[StrExtend::humpToUnderline($this->name)] ?? null;
+        $tableInfo = $data[StrExtend::humpToUnderline($this->name)] ?? [];
         if (!empty($tableInfo) && !AuthService::instance()->isAdmin()) {
             $wheres = $fields = [];
             $roleIds = AuthService::instance()->getUserRoles(true);

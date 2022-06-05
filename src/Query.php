@@ -31,9 +31,9 @@ class Query extends \think\db\Query
     {
         try {
             if (is_string($data) || is_numeric($data)) {
-                $data = $this->allowEmpty()->find($data);
+                $data = $this->cache()->withCache()->allowEmpty()->find($data);
             } elseif (is_array($data)) {
-                $data = $this->where($data)->allowEmpty()->find();
+                $data = $this->where($data)->cache()->withCache()->allowEmpty()->find();
             } else {
                 return [];
             }
@@ -58,7 +58,7 @@ class Query extends \think\db\Query
     public function _list($where = null, ?callable $callable = null): array
     {
         try {
-            $data = $this->where($where)->select()->toArray();
+            $data = $this->where($where)->cache()->withCache()->select()->toArray();
             if (is_callable($callable)) {
                 $data = array_map($callable, $data);
             }
@@ -79,7 +79,7 @@ class Query extends \think\db\Query
     public function _page($listRows = null, $simple = false, ?callable $callable = null): array
     {
         try {
-            $data = $this->paginate([
+            $data = $this->cache()->withCache()->paginate([
                 'list_rows' => $listRows['limit'] ?? 15,
                 'page' => $listRows['page'] ?? 1,
             ], $simple)->toArray();
