@@ -20,7 +20,7 @@ class Library extends Service
         // 绑定URL类
         $this->app->bind(['think\route\Url' => Url::class]);
         // 绑定异常处理
-        $this->app->bind(['think\exception\Handle' => Http::class]);
+        //$this->app->bind(['think\exception\Handle' => Http::class]);
         // 设置扩展配置文件
         $libraryConfigPath = NodeService::instance()->scanDirArray($this->app->getRootPath() . 'vendor/svipchao/cccms-library/src/cccms/config/', []);
         foreach ($libraryConfigPath as $libraryConfig) {
