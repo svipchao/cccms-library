@@ -134,14 +134,14 @@ if (!function_exists('_validate')) {
             _result(['code' => 412, 'msg' => '需要验证的数据为空'], _getEnCode());
         }
         if (!empty($filterParams)) {
-            [$tableName, $requireParams, $optionalParams, $extraParams] = array_pad([], 4, '');
+            [$tableName, $requireParams, $optionalParams] = array_pad([], 3, '');
             if (is_string($filterParams)) {
-                [$tableName, $requireParams, $optionalParams, $extraParams] = array_pad(explode('|', $filterParams), 4, "");
+                [$tableName, $requireParams, $optionalParams] = array_pad(explode('|', $filterParams), 3, "");
             } elseif (is_array($filterParams)) {
-                [$tableName, $requireParams, $optionalParams, $extraParams] = array_pad($filterParams, 4, "");
+                [$tableName, $requireParams, $optionalParams] = array_pad($filterParams, 3, "");
             }
 
-            function handleParams($params)
+            function handleParams($params, &$extraParams)
             {
                 if (empty($params)) return [];
                 if (is_string($params)) $params = explode(',', $params);
@@ -149,19 +149,19 @@ if (!function_exists('_validate')) {
                     if (is_int($key)) {
                         unset($params[$key]);
                         $params[$value] = 0;
+                    } else {
+                        $extraParams[$key] = $value;
                     }
                 }
                 return $params;
             }
 
-            [$requireParams, $optionalParams, $extraParams] = [
-                handleParams($requireParams),
-                handleParams($optionalParams),
-                handleParams($extraParams)
+            // 额外参数
+            $extraParams = [];
+            [$requireParams, $optionalParams] = [
+                handleParams($requireParams, $extraParams),
+                handleParams($optionalParams, $extraParams)
             ];
-            // 额外参数重新赋值
-            $extraParams = array_replace($extraParams, array_intersect_key($params, $extraParams));
-
             // 获取全部表字段信息
             $tables = InitService::instance()->getTables();
             // 表信息
@@ -176,10 +176,6 @@ if (!function_exists('_validate')) {
                 // 将字段默认值重置为空
                 $optionalParams = array_merge(array_fill_keys($tableFields, null), $optionalParams);
             }
-            // 必选参数和可选参数都为空就没必要往下执行了
-            // if (empty($requireParams) && empty($optionalParams)) {
-                // _result(['code' => 412, 'msg' => '需要验证的字段无效'], _getEnCode());
-            // }
             // 判断必须存在的数据是否存在
             $requireParamsDiff = array_diff_key($requireParams, $params);
             if (!empty($requireParamsDiff)) {
@@ -204,6 +200,7 @@ if (!function_exists('_validate')) {
         if (!$validate->rule($rule)->message($message)->check($params)) {
             _result(['code' => 412, 'msg' => $validate->getError()], _getEnCode()); // 先决条件错误
         }
+        // 将定义默认值的参数返回 考虑到更新时 用户会传递部分参数，如果为空会将数据重置为空
         return array_merge($extraParams ?? [], $params);
     }
 }

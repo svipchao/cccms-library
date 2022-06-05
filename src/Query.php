@@ -4,35 +4,49 @@ declare(strict_types=1);
 namespace cccms;
 
 use cccms\extend\StrExtend;
-use think\db\exception\{DbException, DataNotFoundException, ModelNotFoundException};
+use think\db\exception\DbException;
 
 class Query extends \think\db\Query
 {
+    public function _withSearch($fields, array $data = [], string $prefix = '', $value = null): Query
+    {
+        if (is_string($fields)) {
+            $fields = explode(',', $fields);
+        }
+        foreach ($fields as $key => $field) {
+            if (array_key_exists($field, $data) && $data[$field] === $value) {
+                unset($fields[$key], $data[$field]);
+            }
+        }
+        return parent::withSearch($fields, $data, $prefix);
+    }
+
     /**
      * 查找数据
      * @param mixed $data
      * @param callable|null $callable 回调
      * @return mixed
-     * @throws DbException
-     * @throws DataNotFoundException
-     * @throws ModelNotFoundException
      */
     public function _read($data = null, ?callable $callable = null)
     {
-        if (is_string($data) || is_numeric($data)) {
-            $data = $this->allowEmpty()->find($data);
-        } elseif (is_array($data)) {
-            $data = $this->where($data)->allowEmpty()->find();
-        } else {
-            return [];
+        try {
+            if (is_string($data) || is_numeric($data)) {
+                $data = $this->allowEmpty()->find($data);
+            } elseif (is_array($data)) {
+                $data = $this->where($data)->allowEmpty()->find();
+            } else {
+                return [];
+            }
+            if ($data->isEmpty()) return [];
+            if (is_callable($callable)) {
+                $data = call_user_func($callable, $data);
+            } else {
+                $data = $data->toArray();
+            }
+            return $data;
+        } catch (DbException $e) {
+            _result(['code' => 403, 'msg' => '查询失败'], _getEnCode());
         }
-        if ($data->isEmpty()) return [];
-        if (is_callable($callable)) {
-            $data = call_user_func($callable, $data);
-        } else {
-            $data = $data->toArray();
-        }
-        return $data;
     }
 
     /**
@@ -40,17 +54,18 @@ class Query extends \think\db\Query
      * @param mixed $where
      * @param callable|null $callable 回调
      * @return array
-     * @throws DataNotFoundException
-     * @throws DbException
-     * @throws ModelNotFoundException
      */
     public function _list($where = null, ?callable $callable = null): array
     {
-        $data = $this->where($where)->select()->toArray();
-        if (is_callable($callable)) {
-            $data = array_map($callable, $data);
+        try {
+            $data = $this->where($where)->select()->toArray();
+            if (is_callable($callable)) {
+                $data = array_map($callable, $data);
+            }
+            return $data;
+        } catch (DbException $e) {
+            _result(['code' => 403, 'msg' => '查询失败'], _getEnCode());
         }
-        return $data;
     }
 
     /**
@@ -60,25 +75,27 @@ class Query extends \think\db\Query
      * @param int|bool $simple 是否简洁模式或者总记录数
      * @param callable|null $callable 回调
      * @return array
-     * @throws DbException
      */
     public function _page($listRows = null, $simple = false, ?callable $callable = null): array
     {
-        $data = $this->paginate([
-            'list_rows' => $listRows['limit'] ?? 15,
-            'page' => $listRows['page'] ?? 1,
-        ], $simple)->toArray();
-        if (is_callable($callable)) {
-            $data['data'] = array_map($callable, $data['data']);
+        try {
+            $data = $this->paginate([
+                'list_rows' => $listRows['limit'] ?? 15,
+                'page' => $listRows['page'] ?? 1,
+            ], $simple)->toArray();
+            if (is_callable($callable)) {
+                $data['data'] = array_map($callable, $data['data']);
+            }
+            return $data;
+        } catch (DbException $e) {
+            _result(['code' => 403, 'msg' => '查询分页失败'], _getEnCode());
         }
-        return $data;
     }
 
     /**
      * 快捷删除逻辑器
      * @param mixed $condition
      * @return bool
-     * @throws DbException
      */
     public function _delete($condition): bool
     {
@@ -101,6 +118,10 @@ class Query extends \think\db\Query
             // 软删除
             if (in_array('delete_time', $fields)) $data['delete_time'] = time();
         }
-        return (bool)(empty($data) ? $query->delete() : $query->update($data));
+        try {
+            return (bool)(empty($data) ? $query->delete() : $query->update($data));
+        } catch (DbException $e) {
+            _result(['code' => 200, 'msg' => '数据删除失败, 请稍候再试！'], _getEnCode());
+        }
     }
 }
