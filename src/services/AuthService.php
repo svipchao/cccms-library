@@ -5,7 +5,7 @@ namespace cccms\services;
 
 use cccms\Service;
 use cccms\extend\{ArrExtend, StrExtend};
-use app\admin\model\{SysUser, SysRole, SysGroup};
+use app\admin\model\{SysAuth, SysUser, SysRole, SysGroup};
 
 class AuthService extends Service
 {
@@ -25,36 +25,12 @@ class AuthService extends Service
     {
         if (empty($condition) && empty(_getAccessToken('id'))) return [];
         $condition = $condition ?: ['id' => _getAccessToken('id')];
-        if (isset($condition['id']) && $condition['id'] == 1) {
-            $userInfo = SysUser::mk([], false)->cache()->_read(1);
-        } else {
-            $userInfo = SysUser::mk([], false)->with(['loginGroups.loginRoles.loginNodes'])
-                ->withCache()->cache()->_read($condition);
-        }
+        $userInfo = SysUser::mk()->_read($condition);
         if (empty($userInfo)) {
             _result(['code' => 401, 'msg' => '账号不存在'], _getEnCode());
         }
         if (!$userInfo['status']) {
             _result(['code' => 401, 'msg' => '账号已被禁用'], _getEnCode());
-        }
-        $userInfo = array_merge(['groups' => [], 'roles' => [], 'nodes' => []], $userInfo);
-        if ($userInfo['id'] == 1) {
-            $userInfo['groups'] = SysGroup::mk([], false)->cache()
-                ->field('id,group_id,group_name,group_desc')->_list();
-            $userInfo['roles'] = SysRole::mk([], false)->cache()
-                ->field('id,role_id,role_name,role_desc')->_list();
-            $userInfo['nodes'] = NodeService::instance()->getNodes();
-        } else {
-            foreach ($userInfo['loginGroups'] as &$group) {
-                foreach ($group['loginRoles'] as &$role) {
-                    $userInfo['nodes'] = array_merge($userInfo['nodes'] ?? [], array_column($role['loginNodes'], 'node'));
-                    unset($role['loginNodes'], $role['status'], $role['create_time'], $role['update_time']);
-                }
-                $userInfo['roles'] = array_merge($userInfo['roles'] ?? [], $group['loginRoles']);
-                unset($group['loginRoles'], $group['status'], $group['create_time'], $group['update_time']);
-            }
-            $userInfo['groups'] = $userInfo['loginGroups'];
-            unset($userInfo['loginGroups']);
         }
         return $userInfo;
     }
@@ -77,19 +53,18 @@ class AuthService extends Service
      */
     public function getUserRoles(bool $isId = false, bool $isTree = false): array
     {
-        $roles = $this->getAllRoles();
-        if (!$this->isAdmin()) {
-            $role_ids = array_column($this->getUserInfo('roles'), 'id');
-            $roles = ArrExtend::toChildren($roles, $role_ids, true, 'id', 'role_id');
-        }
-        if ($isId) {
-            return array_column($roles, 'id');
-        }
+        $roles = ArrExtend::toChildren(
+            SysRole::mk()->_list(),
+            array_column(SysAuth::mk()->getUserRoles($this->getUserInfo('id')), 'id'),
+            true,
+            'id',
+            'role_id'
+        );
+        if ($isId) return array_column($roles, 'id');
         if ($isTree) {
             return ArrExtend::toTreeArray($roles, 'id', 'role_id');
-        } else {
-            return ArrExtend::toTreeList($roles, 'id', 'role_id');
         }
+        return ArrExtend::toTreeList($roles, 'id', 'role_id');
     }
 
     /**
@@ -101,7 +76,13 @@ class AuthService extends Service
      */
     public function getRoleChildren(int $role_id = 0, bool $withSelf = true, bool $isId = true): array
     {
-        $roles = ArrExtend::toChildren($this->getAllRoles(), $role_id, $withSelf, 'id', 'role_id');
+        $roles = ArrExtend::toChildren(
+            SysRole::mk()->getAllRoles(),
+            $role_id,
+            $withSelf,
+            'id',
+            'role_id'
+        );
         return $isId ? array_column($roles, 'id') : $roles;
     }
 
@@ -113,19 +94,18 @@ class AuthService extends Service
      */
     public function getUserGroups(bool $isId = false, bool $isTree = false): array
     {
-        $groups = $this->getAllGroups();
-        if (!$this->isAdmin()) {
-            $group_ids = array_column($this->getUserInfo('groups'), 'id');
-            $groups = ArrExtend::toChildren($groups, $group_ids, true, 'id', 'group_id');
-        }
-        if ($isId) {
-            return array_column($groups, 'id');
-        }
+        $groups = ArrExtend::toChildren(
+            SysGroup::mk()->_list(),
+            array_column(SysAuth::mk()->getUserGroups($this->getUserInfo('id')), 'id'),
+            true,
+            'id',
+            'group_id'
+        );
+        if ($isId) return array_column($groups, 'id');
         if ($isTree) {
             return ArrExtend::toTreeArray($groups, 'id', 'group_id');
-        } else {
-            return ArrExtend::toTreeList($groups, 'id', 'group_id');
         }
+        return ArrExtend::toTreeList($groups, 'id', 'group_id');
     }
 
     /**
@@ -137,7 +117,13 @@ class AuthService extends Service
      */
     public function getGroupChildren(int $group_id = 0, bool $withSelf = true, bool $isId = true): array
     {
-        $groups = ArrExtend::toChildren($this->getAllGroups(), $group_id, $withSelf, 'id', 'group_id');
+        $groups = ArrExtend::toChildren(
+            SysGroup::mk()->getAllGroups(),
+            $group_id,
+            $withSelf,
+            'id',
+            'group_id'
+        );
         return $isId ? array_column($groups, 'id') : $groups;
     }
 
@@ -145,9 +131,9 @@ class AuthService extends Service
      * 获取用户权限节点
      *
      */
-    public function getUserNodes()
+    public function getUserNodes(): array
     {
-        return $this->getUserInfo('nodes');
+        return SysAuth::mk()->getUserNodes($this->getUserInfo('id'));
     }
 
     /**
@@ -166,23 +152,7 @@ class AuthService extends Service
      */
     public function isAuth(string $node = ''): bool
     {
-        return in_array($node, $this->getUserInfo('nodes') ?: []);
-    }
-
-    /**
-     * 获取全部组织
-     */
-    public function getAllGroups(): array
-    {
-        return SysGroup::mk()->field('id,group_id,group_name,group_desc')->cache(600)->_list();
-    }
-
-    /**
-     * 获取全部角色
-     */
-    public function getAllRoles(): array
-    {
-        return SysRole::mk()->field('id,role_id,role_name,role_desc')->cache(600)->_list();
+        return in_array($node, $this->getUserNodes() ?: []);
     }
 
     /**

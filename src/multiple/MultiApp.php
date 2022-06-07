@@ -207,18 +207,6 @@ class MultiApp
             //加载应用
             $this->loadApp($appName, $appPath);
         }
-        // 加载公共路由
-        // $this->loadRoutes($this->app->request);
-    }
-
-    // 加载路由
-    protected function loadRoutes(Request $request): Response
-    {
-        $withRoute = $this->app->config->get('app.with_route', true) ? function () {
-            include $this->app->getRootPath() . 'vendor/svipchao/cccms-library/src/cccms/route/common.php';
-        } : null;
-
-        return $this->app->route->dispatch($request, $withRoute);
     }
 
     /**

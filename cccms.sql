@@ -47,6 +47,7 @@ CREATE TABLE `sys_role`
     `role_id`     int unsigned NOT NULL DEFAULT 0 COMMENT '父级ID(noRequire|different:id)',
     `role_name`   varchar(32)  NOT NULL DEFAULT '' COMMENT '角色名称',
     `role_desc`   varchar(255) NOT NULL DEFAULT '' COMMENT '角色备注(noRequire)',
+    `nodes`       text         NOT NULL COMMENT '角色权限',
     `status`      tinyint      NOT NULL DEFAULT 1 COMMENT '状态(in:0,1|length:1)【0:禁用,1:正常】',
     `create_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -54,46 +55,21 @@ CREATE TABLE `sys_role`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci COMMENT = '角色表';
-INSERT INTO `sys_role` (`id`, `role_id`, `role_name`, `role_desc`)
-VALUES (1, 0, '普通用户', '普通用户权限合集'),
-       (2, 1, '客服', '客服权限合集'),
-       (3, 2, '售前', '客服售前权限合集'),
-       (4, 3, '售后', '客服售后权限合集');
+INSERT INTO `sys_role` (`id`, `role_id`, `role_name`, `role_desc`, `nodes`)
+VALUES (1, 0, '普通用户', '普通用户权限合集', ''),
+       (2, 1, '客服', '客服权限合集', ''),
+       (3, 2, '售前', '客服售前权限合集', ''),
+       (4, 3, '售后', '客服售后权限合集', '');
 
-CREATE TABLE `sys_user_group`
+CREATE TABLE `sys_auth`
 (
     `user_id`  int unsigned NOT NULL DEFAULT 0 COMMENT '用户ID',
-    `group_id` int unsigned NOT NULL DEFAULT 0 COMMENT '组织ID',
-    UNIQUE KEY `idx_user_group` (`user_id`, `group_id`) USING BTREE
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_general_ci COMMENT = '用户组织表';
-
-CREATE TABLE `sys_group_role`
-(
-    `group_id` int unsigned NOT NULL DEFAULT 0 COMMENT '组织ID',
     `role_id`  int unsigned NOT NULL DEFAULT 0 COMMENT '角色ID',
-    UNIQUE KEY `idx_group_role` (`group_id`, `role_id`) USING BTREE
+    `group_id` int unsigned NOT NULL DEFAULT 0 COMMENT '组织ID',
+    UNIQUE KEY `idx_user_group` (`user_id`, `role_id`, `group_id`) USING BTREE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_general_ci COMMENT = '组织角色表';
-INSERT INTO `sys_group_role` (`group_id`, `role_id`)
-VALUES (1, 1),
-       (2, 2),
-       (3, 3),
-       (4, 4),
-       (5, 2),
-       (6, 3),
-       (7, 4);
-
-CREATE TABLE `sys_role_node`
-(
-    `role_id` int unsigned NOT NULL DEFAULT 0 COMMENT '角色ID',
-    `node`    varchar(100) NOT NULL DEFAULT '' COMMENT '节点',
-    UNIQUE KEY `idx_role_node` (`role_id`, `node`) USING BTREE
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_general_ci COMMENT = '角色权限表';
+  COLLATE = utf8mb4_general_ci COMMENT = '权限表';
 
 CREATE TABLE `sys_data`
 (
