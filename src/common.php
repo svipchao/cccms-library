@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use think\{Response, Validate};
 use cccms\services\InitService;
-use cccms\extend\{StrExtend, JwtExtend};
+use cccms\extend\StrExtend;
 
 if (!function_exists('_config')) {
     /**
