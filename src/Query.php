@@ -29,7 +29,7 @@ class Query extends \think\db\Query
      */
     public function _read($data = null, ?callable $callable = null)
     {
-//        try {
+        try {
             if (is_string($data) || is_numeric($data)) {
                 $data = $this->cache()->withCache()->allowEmpty()->find($data);
             } elseif (is_array($data)) {
@@ -44,9 +44,9 @@ class Query extends \think\db\Query
                 $data = $data->toArray();
             }
             return $data;
-//        } catch (DbException $e) {
-//            _result(['code' => 403, 'msg' => '查询失败'], _getEnCode());
-//        }
+        } catch (DbException $e) {
+            _result(['code' => 403, 'msg' => '查询失败'], _getEnCode());
+        }
     }
 
     /**
@@ -57,15 +57,15 @@ class Query extends \think\db\Query
      */
     public function _list($where = null, ?callable $callable = null): array
     {
-//        try {
-        $data = $this->where($where)->cache()->withCache()->select()->toArray();
-        if (is_callable($callable)) {
-            $data = array_map($callable, $data);
+        try {
+            $data = $this->where($where)->cache()->withCache()->select()->toArray();
+            if (is_callable($callable)) {
+                $data = array_map($callable, $data);
+            }
+            return $data;
+        } catch (DbException $e) {
+            _result(['code' => 403, 'msg' => '查询失败'], _getEnCode());
         }
-        return $data;
-//        } catch (DbException $e) {
-//            _result(['code' => 403, 'msg' => '查询失败'], _getEnCode());
-//        }
     }
 
     /**
@@ -78,7 +78,7 @@ class Query extends \think\db\Query
      */
     public function _page($listRows = null, $simple = false, ?callable $callable = null): array
     {
-//        try {
+        try {
             $data = $this->cache()->withCache()->paginate([
                 'list_rows' => $listRows['limit'] ?? 15,
                 'page' => $listRows['page'] ?? 1,
@@ -87,9 +87,9 @@ class Query extends \think\db\Query
                 $data['data'] = array_map($callable, $data['data']);
             }
             return $data;
-//        } catch (DbException $e) {
-//            _result(['code' => 403, 'msg' => '查询分页失败'], _getEnCode());
-//        }
+        } catch (DbException $e) {
+            _result(['code' => 403, 'msg' => '查询分页失败'], _getEnCode());
+        }
     }
 
     /**
