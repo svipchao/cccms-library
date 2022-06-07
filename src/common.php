@@ -76,17 +76,11 @@ if (!function_exists('_getAccessToken')) {
     /**
      * 获取 accessToken 值 优先级
      * 注意：GET传进来需要进行 urldecode (PHP)/encodeURIComponent(JS)加密
-     * @param string $key 键
-     * @return mixed
+     * @return array|string|null
      */
-    function _getAccessToken(string $key = '')
+    function _getAccessToken()
     {
-        $accessToken = request()->header('accessToken', '') ?: request()->param('accessToken', '');
-        $jwt = JwtExtend::verifyToken($accessToken ?: Session('accessToken'));
-        if (!isset($jwt['exp']) || $jwt['exp'] < time()) {
-            return [];
-        }
-        return $key ? $jwt[$key] ?? [] : $jwt;
+        return request()->header('accessToken', request()->param('accessToken', Session('accessToken')));
     }
 }
 

@@ -47,7 +47,7 @@ CREATE TABLE `sys_role`
     `role_id`     int unsigned NOT NULL DEFAULT 0 COMMENT '父级ID(noRequire|different:id)',
     `role_name`   varchar(32)  NOT NULL DEFAULT '' COMMENT '角色名称',
     `role_desc`   varchar(255) NOT NULL DEFAULT '' COMMENT '角色备注(noRequire)',
-    `nodes`       text         NOT NULL COMMENT '角色权限',
+    `nodes`       text         NOT NULL COMMENT '角色权限(noRequire)',
     `status`      tinyint      NOT NULL DEFAULT 1 COMMENT '状态(in:0,1|length:1)【0:禁用,1:正常】',
     `create_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',

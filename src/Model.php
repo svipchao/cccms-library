@@ -20,15 +20,9 @@ abstract class Model extends \think\Model
      * 创建模型实例
      * @return static
      */
-    public static function mk($data = [], $isScope = true): Model
+    public static function mk($data = []): Model
     {
-        $model = new static($data);
-        if (!$isScope) {
-            $model->scope([]);
-        } else {
-            $model->scope(['field']);
-        }
-        return $model;
+        return new static($data);
     }
 
     // 字段权限

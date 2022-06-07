@@ -27,7 +27,7 @@ class LocalStorage extends Storage
         $saveName = [];
         if (is_string($pathOrId)) {
             foreach ($res as $val) {
-                $file_url = str_replace('\\','/', Filesystem::putFile($pathOrId, $val, 'date("Y-m-d")'));
+                $file_url = str_replace('\\', '/', Filesystem::putFile($pathOrId, $val, 'date("Y-m-d")'));
                 $saveName[] = [
                     'file_url' => $file_url,
                     'file_name' => $val->getoriginalName(),
@@ -40,7 +40,7 @@ class LocalStorage extends Storage
             $user_id = AuthService::instance()->getUserInfo('id');
             $path = $this->getTypePath((int)$pathOrId);
             foreach ($res as $val) {
-                $file_url = str_replace('\\','/', Filesystem::putFile($path, $val, 'date("Y-m-d")'));
+                $file_url = str_replace('\\', '/', Filesystem::putFile($path, $val, 'date("Y-m-d")'));
                 $saveName[] = [
                     'user_id' => $user_id,
                     'type_id' => $pathOrId,
@@ -74,7 +74,7 @@ class LocalStorage extends Storage
                 $fileInfo->delete();
             }
             // 磁盘文件路径
-            $filePath = $this->getLocalPath() . $this->getTypePath($fileInfo['type_id']) . '/' . $fileInfo['file_url'];
+            $filePath = $this->getLocalPath() . '/' . $fileInfo['file_url'];
         }
         // 判断附件是否在磁盘中
         if (file_exists($filePath) && !unlink($filePath)) {

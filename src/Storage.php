@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace cccms;
 
 use think\{App, Container};
-use app\admin\model\{SysFile, SysTypes};
+use app\admin\model\SysFile;
 use cccms\services\TypesService;
 
 /**
@@ -63,17 +63,9 @@ abstract class Storage
     /**
      * 获取local磁盘路径
      */
-    public function getLocalPath()
+    public function getLocalPath(): string
     {
         return $this->app->getRootPath() . 'public/uploads/';
-    }
-
-    /**
-     * 记录文件信息
-     */
-    public function insert(array $fileInfos)
-    {
-        $this->model->insertAll($fileInfos);
     }
 
     /**
@@ -83,15 +75,15 @@ abstract class Storage
     {
         $code = $this->app->request->param('code', '');
         if (empty($code)) {
-            _result(['code' => 404, 'msg' => '附件访问码不能为空'], _getEnCode('view'));
+            _result(['code' => 404, 'msg' => '附件访问码不能为空'], _getEnCode());
         }
         // 这里需要关闭权限数据验证 有些地方无法登录
         $file = SysFile::mk()->where(['file_code' => $code])->findOrEmpty();
         if ($file->isEmpty()) {
-            _result(['code' => 404, 'msg' => '附件不存在'], _getEnCode('view'));
+            _result(['code' => 404, 'msg' => '附件不存在'], _getEnCode());
         }
         if ($file->status === 0) {
-            _result(['code' => 403, 'msg' => '禁止访问附件'], _getEnCode('view'));
+            _result(['code' => 403, 'msg' => '禁止访问附件'], _getEnCode());
         }
         // 获取磁盘类型
         $diskPath = _config('storage.diskType', 'local');
@@ -99,7 +91,7 @@ abstract class Storage
         $diskPath = str_replace(['\\', '//'], ['/', '/'], $diskPath . $this->getTypePath() . '/' . $file['file_url']);
         // 判断附件是否在磁盘中
         if (!$resFile = @readfile($diskPath)) {
-            _result(['code' => 404, 'msg' => '无法访问附件'], _getEnCode('view'));
+            _result(['code' => 404, 'msg' => '无法访问附件'], _getEnCode());
         }
         _result(['code' => 200, 'msg' => 'success', 'data' => $resFile], 'view', [
             'Content-Type' => $file['file_mime'] . ';',

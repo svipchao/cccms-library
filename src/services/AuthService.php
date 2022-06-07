@@ -4,36 +4,12 @@ declare(strict_types=1);
 namespace cccms\services;
 
 use cccms\Service;
-use cccms\extend\{ArrExtend, StrExtend};
-use app\admin\model\{SysAuth, SysUser, SysRole, SysGroup};
+use cccms\extend\{ArrExtend, JwtExtend, StrExtend};
+use app\admin\model\{SysAuth, SysRole, SysGroup};
 
 class AuthService extends Service
 {
-    protected array $userInfo = [];
-
-    public function initialize(): void
-    {
-        $this->userInfo = $this->setUserInfo();
-    }
-
-    /**
-     * 获取用户信息
-     * @param array $condition
-     * @return array
-     */
-    public function setUserInfo(array $condition = []): array
-    {
-        if (empty($condition) && empty(_getAccessToken('id'))) return [];
-        $condition = $condition ?: ['id' => _getAccessToken('id')];
-        $userInfo = SysUser::mk()->_read($condition);
-        if (empty($userInfo)) {
-            _result(['code' => 401, 'msg' => '账号不存在'], _getEnCode());
-        }
-        if (!$userInfo['status']) {
-            _result(['code' => 401, 'msg' => '账号已被禁用'], _getEnCode());
-        }
-        return $userInfo;
-    }
+    protected $userInfo;
 
     /**
      * 获取用户信息
@@ -42,7 +18,11 @@ class AuthService extends Service
      */
     public function getUserInfo(string $key = '')
     {
-        return $this->userInfo[$key] ?? $this->userInfo;
+        $this->userInfo = JwtExtend::verifyToken(_getAccessToken());
+        if (!empty($this->userInfo['exp']) && $this->userInfo['exp'] < time()) {
+            _result(['code' => 401, 'msg' => '登陆状态失效，请重新登陆'], _getEnCode());
+        }
+        return $key ? ($this->userInfo[$key] ?? '') : $this->userInfo;
     }
 
     /**
