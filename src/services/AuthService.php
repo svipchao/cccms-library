@@ -19,7 +19,7 @@ class AuthService extends Service
     public function getUserInfo(string $key = '')
     {
         $this->userInfo = JwtExtend::verifyToken(_getAccessToken());
-        if (!empty($this->userInfo['exp']) && $this->userInfo['exp'] < time()) {
+        if (!$this->userInfo || !empty($this->userInfo['exp']) && $this->userInfo['exp'] < time()) {
             _result(['code' => 401, 'msg' => '登陆状态失效，请重新登陆'], _getEnCode());
         }
         return $key ? ($this->userInfo[$key] ?? '') : $this->userInfo;
