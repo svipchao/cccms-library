@@ -35,7 +35,7 @@ class Query extends \think\db\Query
             } elseif (is_array($data)) {
                 $data = $this->where($data)->cache()->withCache()->allowEmpty()->find();
             } else {
-                return [];
+                $data = $this->cache()->withCache()->allowEmpty()->find();
             }
             if ($data->isEmpty()) return [];
             if (is_callable($callable)) {
