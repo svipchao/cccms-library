@@ -37,7 +37,6 @@ class Query extends \think\db\Query
             } else {
                 $data = $this->cache()->withCache()->allowEmpty()->find();
             }
-            if ($data->isEmpty()) return [];
             if (is_callable($callable)) {
                 $data = call_user_func($callable, $data);
             } else {
