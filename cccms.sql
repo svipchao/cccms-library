@@ -63,10 +63,10 @@ VALUES (1, 0, '普通用户', '普通用户权限合集', ''),
 
 CREATE TABLE `sys_auth`
 (
-    `user_id`  int unsigned NOT NULL DEFAULT 0 COMMENT '用户ID',
-    `role_id`  int unsigned NOT NULL DEFAULT 0 COMMENT '角色ID',
-    `group_id` int unsigned NOT NULL DEFAULT 0 COMMENT '组织ID',
-    `owner`    tinyint      NOT NULL DEFAULT 1 COMMENT '所有者(in:0,1)【0:否,1:是】',
+    `user_id`       int unsigned NOT NULL DEFAULT 0 COMMENT '用户ID',
+    `role_id`       int unsigned NOT NULL DEFAULT 0 COMMENT '角色ID',
+    `group_id`      int unsigned NOT NULL DEFAULT 0 COMMENT '组织ID',
+    `administrator` tinyint      NOT NULL DEFAULT 1 COMMENT '管理员(in:0,1)【0:否,1:是】',
     UNIQUE KEY `idx_user_group` (`user_id`, `role_id`, `group_id`) USING BTREE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4

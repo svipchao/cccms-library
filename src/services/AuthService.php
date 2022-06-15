@@ -29,13 +29,14 @@ class AuthService extends Service
      * 获取用户角色
      * @param bool $isId
      * @param bool $isTree
+     * @param bool $isAdministrator 是否角色管理员
      * @return array
      */
-    public function getUserRoles(bool $isId = false, bool $isTree = false): array
+    public function getUserRoles(bool $isId = false, bool $isTree = false, bool $isAdministrator = false): array
     {
         $roles = ArrExtend::toChildren(
             SysRole::mk()->_list(),
-            array_column(SysAuth::mk()->getUserRoles($this->getUserInfo('id')), 'id'),
+            array_column(SysAuth::mk()->getUserRoles($this->getUserInfo('id'), $isAdministrator), 'id'),
             true,
             'id',
             'role_id'
@@ -70,13 +71,14 @@ class AuthService extends Service
      * 获取用户组织
      * @param bool $isId
      * @param bool $isTree
+     * @param bool $isAdministrator 是否组织管理员
      * @return array
      */
-    public function getUserGroups(bool $isId = false, bool $isTree = false): array
+    public function getUserGroups(bool $isId = false, bool $isTree = false, bool $isAdministrator = false): array
     {
         $groups = ArrExtend::toChildren(
             SysGroup::mk()->_list(),
-            array_column(SysAuth::mk()->getUserGroups($this->getUserInfo('id')), 'id'),
+            array_column(SysAuth::mk()->getUserGroups($this->getUserInfo('id'), $isAdministrator), 'id'),
             true,
             'id',
             'group_id'
@@ -109,7 +111,6 @@ class AuthService extends Service
 
     /**
      * 获取用户权限节点
-     *
      */
     public function getUserNodes(): array
     {
