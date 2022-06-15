@@ -7,8 +7,8 @@ CREATE TABLE `sys_user`
     `avatar`      varchar(50)  NOT NULL DEFAULT '' COMMENT '头像(noRequire|length:1,50)',
     `intro`       varchar(255) NOT NULL DEFAULT '' COMMENT '简介(noRequire|length:1,255)',
     `token`       char(32)     NOT NULL DEFAULT '' COMMENT 'Token(alphaNum|length:32)',
-    `type`        tinyint      NOT NULL DEFAULT 1 COMMENT '类型(in:0,1|length:1)',
-    `status`      tinyint      NOT NULL DEFAULT 1 COMMENT '状态(in:0,1|length:1)【0:禁用,1:正常】',
+    `type`        tinyint      NOT NULL DEFAULT 1 COMMENT '类型(in:0,1)',
+    `status`      tinyint      NOT NULL DEFAULT 1 COMMENT '状态(in:0,1)【0:禁用,1:正常】',
     `create_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`) USING BTREE,
@@ -25,7 +25,7 @@ CREATE TABLE `sys_group`
     `group_id`    int unsigned NOT NULL DEFAULT 0 COMMENT '父级ID(noRequire|different:id)',
     `group_name`  varchar(32)  NOT NULL DEFAULT '' COMMENT '组织名称',
     `group_desc`  varchar(255) NOT NULL DEFAULT '' COMMENT '组织备注(noRequire)',
-    `status`      tinyint      NOT NULL DEFAULT 1 COMMENT '状态(in:0,1|length:1)【0:禁用,1:正常】',
+    `status`      tinyint      NOT NULL DEFAULT 1 COMMENT '状态(in:0,1)【0:禁用,1:正常】',
     `create_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`) USING BTREE
@@ -48,7 +48,7 @@ CREATE TABLE `sys_role`
     `role_name`   varchar(32)  NOT NULL DEFAULT '' COMMENT '角色名称',
     `role_desc`   varchar(255) NOT NULL DEFAULT '' COMMENT '角色备注(noRequire)',
     `nodes`       text         NOT NULL COMMENT '角色权限(noRequire)',
-    `status`      tinyint      NOT NULL DEFAULT 1 COMMENT '状态(in:0,1|length:1)【0:禁用,1:正常】',
+    `status`      tinyint      NOT NULL DEFAULT 1 COMMENT '状态(in:0,1)【0:禁用,1:正常】',
     `create_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`) USING BTREE
@@ -66,6 +66,7 @@ CREATE TABLE `sys_auth`
     `user_id`  int unsigned NOT NULL DEFAULT 0 COMMENT '用户ID',
     `role_id`  int unsigned NOT NULL DEFAULT 0 COMMENT '角色ID',
     `group_id` int unsigned NOT NULL DEFAULT 0 COMMENT '组织ID',
+    `owner`    tinyint      NOT NULL DEFAULT 1 COMMENT '所有者(in:0,1)【0:否,1:是】',
     UNIQUE KEY `idx_user_group` (`user_id`, `role_id`, `group_id`) USING BTREE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
@@ -105,7 +106,7 @@ CREATE TABLE `sys_log`
 CREATE TABLE `sys_types`
 (
     `id`          int unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
-    `type`        int unsigned NOT NULL DEFAULT 0 COMMENT '分类(between:0,4|length:1)',
+    `type`        int unsigned NOT NULL DEFAULT 0 COMMENT '分类(between:0,4)',
     `name`        varchar(32)  NOT NULL DEFAULT '' COMMENT '类别名称',
     `alias`       varchar(32)  NOT NULL DEFAULT '' COMMENT '类别别名',
     `sort`        int          NOT NULL DEFAULT 0 COMMENT '排序(noRequire)',
@@ -132,7 +133,7 @@ CREATE TABLE `sys_route`
     `ext`         varchar(10)  NOT NULL DEFAULT 'html' COMMENT '链接后缀',
     `name`        varchar(255) NOT NULL DEFAULT '' COMMENT '路由标识',
     `desc`        varchar(255) NOT NULL DEFAULT '' COMMENT '备注(noRequire)',
-    `status`      tinyint      NOT NULL DEFAULT 1 COMMENT '状态(in:0,1|length:1)【0:禁用,1:正常】',
+    `status`      tinyint      NOT NULL DEFAULT 1 COMMENT '状态(in:0,1)【0:禁用,1:正常】',
     `create_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`) USING BTREE,
@@ -153,7 +154,7 @@ CREATE TABLE `sys_menu`
     `url`         varchar(255) NOT NULL DEFAULT '#' COMMENT '链接(noRequire)',
     `node`        varchar(255) NOT NULL DEFAULT '#' COMMENT '节点(noRequire)',
     `sort`        int          NOT NULL DEFAULT 0 COMMENT '排序(noRequire)',
-    `status`      tinyint      NOT NULL DEFAULT 1 COMMENT '状态(in:0,1|length:1)【0:禁用,1:正常】',
+    `status`      tinyint      NOT NULL DEFAULT 1 COMMENT '状态(in:0,1)【0:禁用,1:正常】',
     `create_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`) USING BTREE,
@@ -189,7 +190,7 @@ CREATE TABLE `sys_file`
     `file_mime`    varchar(100) NOT NULL DEFAULT '' COMMENT '文件类型',
     `file_code`    char(32)     NOT NULL DEFAULT '' COMMENT '文件唯一码',
     `extract_code` varchar(20)  NOT NULL DEFAULT '' COMMENT '提取码(noRequire)',
-    `status`       tinyint      NOT NULL DEFAULT 1 COMMENT '状态(in:0,1|length:1)【0:禁用,1:正常】',
+    `status`       tinyint      NOT NULL DEFAULT 1 COMMENT '状态(in:0,1)【0:禁用,1:正常】',
     `create_time`  datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`  datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`) USING BTREE,
