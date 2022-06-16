@@ -118,6 +118,19 @@ class AuthService extends Service
     }
 
     /**
+     * 登录状态是否有效
+     * @return bool
+     */
+    public function isLogin(): bool
+    {
+        $this->userInfo = JwtExtend::verifyToken(_getAccessToken());
+        if (!$this->userInfo || !empty($this->userInfo['exp']) && $this->userInfo['exp'] < time()) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * 判断是否是管理员
      * @return bool
      */

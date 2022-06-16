@@ -16,6 +16,8 @@ use app\admin\model\SysUser;
  */
 abstract class Model extends \think\Model
 {
+    protected $globalScope = ['field'];
+
     /**
      * 创建模型实例
      * @return static
@@ -28,52 +30,65 @@ abstract class Model extends \think\Model
     // 字段权限
     public function scopeField($query)
     {
-        $data = InitService::instance()->getData();
-        $tableInfo = $data[StrExtend::humpToUnderline($this->name)] ?? [];
-        if (!empty($tableInfo) && !AuthService::instance()->isAdmin()) {
-            $wheres = $fields = [];
-            $roleIds = AuthService::instance()->getUserRoles(true);
-            foreach ($tableInfo as $key => $val) {
-                if (in_array($key, $roleIds)) {
-                    array_push($wheres, ...$val['wheres']);
-                    array_push($fields, ...$val['fields']);
+        if (AuthService::instance()->isLogin()) {
+            $data = InitService::instance()->getData();
+            $tableInfo = $data[StrExtend::humpToUnderline($this->name)] ?? [];
+            if (!empty($tableInfo) && !AuthService::instance()->isAdmin()) {
+                $wheres = $fields = [];
+                $roleIds = AuthService::instance()->getUserRoles(true);
+                foreach ($tableInfo as $key => $val) {
+                    if (in_array($key, $roleIds)) {
+                        array_push($wheres, ...$val['wheres']);
+                        array_push($fields, ...$val['fields']);
+                    }
                 }
+                if (!empty($wheres)) $query->where($wheres);
+                if (!empty($fields)) $query->withoutField($fields);
             }
-            if (!empty($wheres)) $query->where($wheres);
-            if (!empty($fields)) $query->withoutField($fields);
         }
     }
 
     // 数据权限
     public function scopeAuth($query, int $user_id = 0)
     {
-        /**
-         * 管理员 不为空 取user_id数据
-         * 用户 不为空 判断是否有相同角色 有 则取 user_id 数据 否则取自己的数据
-         * 管理员 为空 不加条件，取全部数据
-         * 用户 为空 取自己的数据
-         */
-        // 判断表字段是否存在用户ID
-        $tableName = $query->getTable();
-        $field = $tableName === 'sys_user' ? 'id' : 'user_id';
-        if (empty($user_id)) {
-            if (!AuthService::instance()->isAdmin()) {
-                $query->where($field, AuthService::instance()->getUserInfo('id'));
-            }
-        } else {
-            $tableFields = $query->getFields();
-            if (AuthService::instance()->isAdmin()) {
-                $query->where('id', $user_id);
-            } elseif (isset($tableFields['user_id']) || $tableName === 'sys_user') {
-                // 传进来的用户角色
-                $group_ids = SysUser::mk()->with('groups')->_read($user_id, function ($data) {
-                    return $data->groups->column('id');
-                });
-                // 取并集 与当前登录用户存在相同角色则允许 否则查找当前登录用户数据
-                if (empty(array_intersect($group_ids, AuthService::instance()->getUserGroups(true)))) {
-                    $user_id = _getAccessToken('id');
+        if (AuthService::instance()->isLogin()) {
+            /**
+             * 管理员 不为空 取user_id数据
+             * 用户 不为空 判断是否有相同角色 有 则取 user_id 数据 否则取自己的数据
+             * 管理员 为空 不加条件，取全部数据
+             * 用户 为空 取自己的数据
+             */
+            // 判断表字段是否存在用户ID
+            $tables = InitService::instance()->getTables();
+            $tableName = $query->getTable();
+            $tableInfo = $tables[$tableName] ?? [];
+            // 表不存在则跳过
+            if (empty($tableInfo)) return;
+            $field = $tableInfo['table'] === 'sys_user' ? 'id' : 'user_id';
+            // 字段不存在则跳过
+            if (!in_array($field, $tableInfo['fields'])) return;
+            // 获取关联
+
+            halt($tableName);
+            if (empty($user_id)) {
+                if (!AuthService::instance()->isAdmin()) {
+                    $query->where($field, AuthService::instance()->getUserInfo('id'));
                 }
-                $query->where($field, $user_id);
+            } else {
+                $tableFields = $query->getFields();
+                if (AuthService::instance()->isAdmin()) {
+                    $query->where('id', $user_id);
+                } elseif (isset($tableFields['user_id']) || $tableName === 'sys_user') {
+                    // 传进来的用户角色
+                    $group_ids = SysUser::mk()->with('groups')->_read($user_id, function ($data) {
+                        return $data->groups->column('id');
+                    });
+                    // 取并集 与当前登录用户存在相同角色则允许 否则查找当前登录用户数据
+                    if (empty(array_intersect($group_ids, AuthService::instance()->getUserGroups(true)))) {
+                        $user_id = AuthService::instance()->getUserInfo('id');
+                    }
+                    $query->where($field, $user_id);
+                }
             }
         }
     }
