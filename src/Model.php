@@ -68,7 +68,7 @@ abstract class Model extends \think\Model
             if (empty($tableInfo)) return;
             $field = $tableInfo['table'] === 'sys_user' ? 'id' : 'user_id';
             // 字段不存在则跳过
-            if (!in_array($field, $tableInfo['fields'])) return;
+            if (!isset($tableInfo['fields'][$field])) return;
             // 获取关联
             $query->when(!AuthService::instance()->isAdmin(), function ($query) use ($field) {
                 $query->hasWhere('relationAuth', [
