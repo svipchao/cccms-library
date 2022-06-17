@@ -57,11 +57,12 @@ class Query extends \think\db\Query
     public function _list($where = null, ?callable $callable = null): array
     {
         try {
-            $data = $this->where($where)->cache()->withCache()->select()->toArray();
+            $data = $this->where($where)->cache()->withCache()->select();
             if (is_callable($callable)) {
-                $data = array_map($callable, $data);
+                return call_user_func($callable, $data);
+            } else {
+                return $data->toArray();
             }
-            return $data;
         } catch (DbException $e) {
             _result(['code' => 403, 'msg' => '查询失败'], _getEnCode());
         }
@@ -81,11 +82,12 @@ class Query extends \think\db\Query
             $data = $this->cache()->withCache()->paginate([
                 'list_rows' => $listRows['limit'] ?? 15,
                 'page' => $listRows['page'] ?? 1,
-            ], $simple)->toArray();
+            ], $simple);
             if (is_callable($callable)) {
-                $data['data'] = array_map($callable, $data['data']);
+                return call_user_func($callable, $data);
+            } else {
+                return $data->toArray();
             }
-            return $data;
         } catch (DbException $e) {
             _result(['code' => 403, 'msg' => '查询分页失败'], _getEnCode());
         }
