@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace cccms\services;
 
+use app\admin\model\{SysAuth, SysRole, SysGroup};
 use cccms\Service;
 use cccms\extend\{ArrExtend, JwtExtend, StrExtend};
-use app\admin\model\{SysAuth, SysRole, SysGroup};
 
 class AuthService extends Service
 {
