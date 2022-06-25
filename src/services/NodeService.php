@@ -33,7 +33,10 @@ class NodeService extends Service
         return $data;
     }
 
-    // 待扫描文件数组
+    /**
+     * 待扫描文件数组
+     * @return array
+     */
     public function getToScanFileArray(): array
     {
         $ds = DIRECTORY_SEPARATOR;
@@ -48,8 +51,11 @@ class NodeService extends Service
         return $files;
     }
 
-    // 所有框架父级节点 应用节点、类节点
-    public function getFrameNodes()
+    /**
+     * 所有框架父级节点 应用节点、类节点
+     * @return array
+     */
+    public function getFrameNodes(): array
     {
         $data = $this->app->cache->get('SysFrameNodes') ?? [];
         if (empty($data)) {
@@ -67,7 +73,7 @@ class NodeService extends Service
     }
 
     /**
-     * 获取节点的父级框架节点
+     * 合并框架节点
      * @param array $nodes
      * @param array $frameNodes
      * @return array
@@ -100,6 +106,21 @@ class NodeService extends Service
     public function getNodes(): array
     {
         return array_keys($this->getNodesInfo());
+    }
+
+    /**
+     * 获取所有需要授权的节点
+     * @return array
+     */
+    public function getAuthNodes(): array
+    {
+        $nodes = $this->getNodesInfo();
+        foreach ($nodes as $key => $node) {
+            if (isset($node['auth']) && $node['auth'] === false) {
+                unset($nodes[$key]);
+            }
+        }
+        return $nodes;
     }
 
     /**
