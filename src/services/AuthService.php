@@ -136,7 +136,7 @@ class AuthService extends Service
      */
     public function isAdmin(): bool
     {
-        return $this->userInfo['id'] == 1;
+        return $this->getUserInfo('id') == 1;
     }
 
     /**
