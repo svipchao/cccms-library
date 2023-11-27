@@ -132,7 +132,7 @@ class MultiApp
                     $ds = DIRECTORY_SEPARATOR;
                     $appName = $name ?: $defaultApp;
                     $appPath = $this->path ?: $this->app->getBasePath() . $appName . $ds;
-                    $appPathLibrary = $this->path ?: $this->app->getRootPath() . 'vendor' . $ds . 'svipchao' . $ds . 'cccms-app' . $ds . 'src' . $ds . $appName . $ds;
+                    $appPathLibrary = $this->path ?: $this->app->getRootPath() . 'vendor' . $ds . 'poetry' . $ds . 'cccms-app' . $ds . 'src' . $ds . $appName . $ds;
 
                     if (!is_dir($appPath) && !is_dir($appPathLibrary)) {
                         $express = $this->app->config->get('app.app_express', false);
@@ -183,7 +183,7 @@ class MultiApp
         $this->app->http->name($appName);
 
         $appPath = $this->path ?: $this->app->getBasePath() . $appName . '/';
-        $appPathLibrary = $this->path ?: $this->app->getRootPath() . 'vendor/svipchao/cccms-app/src/' . $appName . '/';
+        $appPathLibrary = $this->path ?: $this->app->getRootPath() . 'vendor/poetry/cccms-app/src/' . $appName . '/';
         $pathInfo = $this->app->request->pathinfo();
         $route = config('route');
         if (empty($pathInfo)) {
@@ -199,7 +199,7 @@ class MultiApp
         $this->app->setNamespace($this->app->config->get('app.app_namespace') ?: 'app\\' . $appName);
 
         // 加载公共路由
-        $this->app->http->setRoutePath($this->app->getRootPath() . 'vendor/svipchao/cccms-library/src/cccms/route/');
+        $this->app->http->setRoutePath($this->app->getRootPath() . 'vendor/poetry/cccms-library/src/cccms/route/');
         if (is_dir($appPath)) {
             $this->app->setRuntimePath($this->app->getRuntimePath() . $appName . DIRECTORY_SEPARATOR);
             $this->app->http->setRoutePath($this->getRoutePath());

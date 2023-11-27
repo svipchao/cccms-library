@@ -1,12 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace cccms;
 
 use think\Service;
-use cccms\exception\Http;
 use cccms\services\NodeService;
-use cccms\multiple\{Url, MultiApp};
+use cccms\multiple\{Url, Cors, MultiApp};
 
 class Library extends Service
 {
@@ -15,12 +15,13 @@ class Library extends Service
     {
         // 多应用
         $this->app->event->listen('HttpRun', function () {
+            $this->app->middleware->add(Cors::class);
             $this->app->middleware->add(MultiApp::class);
         });
         // 绑定URL类
         $this->app->bind(['think\route\Url' => Url::class]);
         // 设置扩展配置文件
-        $libraryConfigPath = NodeService::instance()->scanDirArray($this->app->getRootPath() . 'vendor/svipchao/cccms-library/src/cccms/config/', []);
+        $libraryConfigPath = NodeService::instance()->scanDirArray($this->app->getRootPath() . 'vendor/poetry/cccms-library/src/cccms/config/', []);
         foreach ($libraryConfigPath as $libraryConfig) {
             $this->app->config->load($libraryConfig, pathinfo($libraryConfig, PATHINFO_FILENAME));
         }

@@ -41,7 +41,7 @@ class NodeService extends Service
     {
         $ds = DIRECTORY_SEPARATOR;
         $files = array_merge_recursive(
-            $this->scanDirArray($this->app->getRootPath() . 'vendor' . $ds . 'svipchao' . $ds . 'cccms-app' . $ds . 'src' . $ds),
+            $this->scanDirArray($this->app->getRootPath() . 'vendor' . $ds . 'poetry' . $ds . 'cccms-app' . $ds . 'src' . $ds),
             $this->scanDirArray($this->app->getBasePath())
         );
         // 这里需要处理一次结果

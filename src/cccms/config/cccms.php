@@ -5,7 +5,7 @@ return [
         'admin' => '基础系统',
         'index' => '默认应用',
     ],
-    'resultPath' => app()->getRootPath() . 'vendor/svipchao/cccms-library/src/cccms/views/result.tpl',
+    'resultPath' => app()->getRootPath() . 'vendor/poetry/cccms-library/src/cccms/views/result.tpl',
     'middleware' => [
         'think\middleware\SessionInit'
     ],
