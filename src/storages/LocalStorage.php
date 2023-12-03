@@ -34,6 +34,8 @@ class LocalStorage extends Storage
                     'file_size' => $val->getSize(),
                     'file_ext' => $val->getOriginalExtension(),
                     'file_mime' => $val->getOriginalMime(),
+                    'file_md5' => $val->md5(),
+                    'file_sha1' => $val->sha1(),
                 ];
             }
         } else {
@@ -49,6 +51,8 @@ class LocalStorage extends Storage
                     'file_size' => $val->getSize(),
                     'file_ext' => $val->getOriginalExtension(),
                     'file_mime' => $val->getOriginalMime(),
+                    'file_md5' => $val->md5(),
+                    'file_sha1' => $val->sha1(),
                     'file_code' => md5(mt_rand($user_id, time()) . $val->hashName() . $val->getPathname()),
                 ];
             }
