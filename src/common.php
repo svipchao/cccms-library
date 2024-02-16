@@ -26,7 +26,9 @@ if (!function_exists('_xss_safe')) {
     {
         // 将所有 onXxx= 中的字母 o 替换为符号 ο，注意它不是字母
         $rules = ['#<script.*?<\/script>#is' => '', '#(\s)on(\w+=\S)#i' => '$1οn$2'];
-        return preg_replace(array_keys($rules), array_values($rules), trim($text));
+        // trim 会去除\n
+        return preg_replace(array_keys($rules), array_values($rules), $text);
+        // return preg_replace(array_keys($rules), array_values($rules), trim($text));
     }
 }
 
@@ -114,6 +116,8 @@ if (!function_exists('_validate')) {
             $params = array_merge($requireParams, $optionalParams);
         }
         if (is_string($method) && method_exists(request(), $method)) {
+            halt(halt(request()->put()));
+            halt(request()->$method());
             $params = array_intersect_key(request()->$method(), $params);
             $params = array_merge($requireParams, $params);
         }
