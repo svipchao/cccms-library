@@ -116,8 +116,6 @@ if (!function_exists('_validate')) {
             $params = array_merge($requireParams, $optionalParams);
         }
         if (is_string($method) && method_exists(request(), $method)) {
-            halt(halt(request()->put()));
-            halt(request()->$method());
             $params = array_intersect_key(request()->$method(), $params);
             $params = array_merge($requireParams, $params);
         }
