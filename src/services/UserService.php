@@ -28,7 +28,7 @@ class UserService extends Service
      * @param mixed $default
      * @return mixed
      */
-    public function getUserInfo(string $key = 'all', mixed $default = ''): mixed
+    public function getUserInfo(string $key = 'all', mixed $default = null): mixed
     {
         $userInfo = JwtExtend::verifyToken($this->getAccessToken());
         if (!$userInfo || !empty($userInfo['exp']) && $userInfo < time()) {
