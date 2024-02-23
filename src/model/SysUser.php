@@ -163,15 +163,15 @@ class SysUser extends Model
      * @param $value
      * @param $data
      */
-    public function setPassWordAttr($value, $data)
-    {
-        if (empty($value)) {
-            unset($data['password']);
-            $this->data($data, true);
-        } else {
-            return md5($value);
-        }
-    }
+    // public function setPassWordAttr($value, $data)
+    // {
+    //     if (empty($value)) {
+    //         unset($data['password']);
+    //         $this->data($data, true);
+    //     } else {
+    //         return md5($value);
+    //     }
+    // }
 
     /**
      * 设置账号状态
