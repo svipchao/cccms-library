@@ -48,7 +48,7 @@ class SysUser extends Model
 
     public function depts(): BelongsToMany
     {
-        return $this->belongsToMany(SysRole::class, SysAuth::class, 'dept_id', 'user_id');
+        return $this->belongsToMany(SysDept::class, SysAuth::class, 'dept_id', 'user_id');
     }
 
     public function roles(): BelongsToMany
