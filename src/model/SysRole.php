@@ -76,19 +76,23 @@ class SysRole extends Model
     public function getAllOpenRole($isTree = false): array
     {
         if ($isTree) {
-            $data = cache('allRoleOpenTree');
-            if (empty($data)) {
-                $data = $this->where('status', 1)->_list();
-                $data = ArrExtend::toTreeArray($data, 'id', 'role_id');
-                cache('allRoleOpenTree', $data);
-            }
+            // $data = cache('allRoleOpenTree');
+            // if (empty($data)) {
+            //     $data = $this->where('status', 1)->_list();
+            //     $data = ArrExtend::toTreeArray($data, 'id', 'role_id');
+            //     cache('allRoleOpenTree', $data);
+            // }
+            $data = $this->where('status', 1)->_list();
+            $data = ArrExtend::toTreeArray($data, 'id', 'role_id');
         } else {
-            $data = cache('allRoleOpenList');
-            if (empty($data)) {
-                $data = $this->where('status', 1)->_list();
-                $data = ArrExtend::toTreeList($data, 'id', 'role_id');
-                cache('allRoleOpenList', $data);
-            }
+            // $data = cache('allRoleOpenList');
+            // if (empty($data)) {
+            //     $data = $this->where('status', 1)->_list();
+            //     $data = ArrExtend::toTreeList($data, 'id', 'role_id');
+            //     cache('allRoleOpenList', $data);
+            // }
+            $data = $this->where('status', 1)->_list();
+            $data = ArrExtend::toTreeList($data, 'id', 'role_id');
         }
         return $data;
     }
