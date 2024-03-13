@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace cccms\model;
@@ -100,19 +101,25 @@ class SysDept extends Model
     public function getAllOpenDept($isTree = false): array
     {
         if ($isTree) {
-            $data = cache('allDeptOpenTree');
-            if (empty($data)) {
-                $data = $this->where('status', 1)->_list();
-                $data = ArrExtend::toTreeArray($data, 'id', 'dept_id');
-                cache('allDeptOpenTree', $data);
-            }
+            // 移除部门缓存
+            // $data = cache('allDeptOpenTree');
+            // if (empty($data)) {
+            //     $data = $this->where('status', 1)->_list();
+            //     $data = ArrExtend::toTreeArray($data, 'id', 'dept_id');
+            //     cache('allDeptOpenTree', $data);
+            // }
+            $data = $this->where('status', 1)->_list();
+            $data = ArrExtend::toTreeArray($data, 'id', 'dept_id');
         } else {
-            $data = cache('allDeptOpenList');
-            if (empty($data)) {
-                $data = $this->where('status', 1)->_list();
-                $data = ArrExtend::toTreeList($data, 'id', 'dept_id');
-                cache('allDeptOpenList', $data);
-            }
+            // 移除部门缓存
+            // $data = cache('allDeptOpenList');
+            // if (empty($data)) {
+            //     $data = $this->where('status', 1)->_list();
+            //     $data = ArrExtend::toTreeList($data, 'id', 'dept_id');
+            //     cache('allDeptOpenList', $data);
+            // }
+            $data = $this->where('status', 1)->_list();
+            $data = ArrExtend::toTreeList($data, 'id', 'dept_id');
         }
         return $data;
     }
