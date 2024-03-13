@@ -29,8 +29,8 @@ class SysDept extends Model
             }
             $this->saveAll($sonRes);
         } else {
-            // 新增
-            $this->data($data, true);
+            // 新增 修复选择上级部门500报错
+            // $this->data($data, true);
         }
         return $value;
     }
