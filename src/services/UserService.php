@@ -82,7 +82,7 @@ class UserService extends Service
             $userDeptIds = array_filter(array_column($userData, 'dept_id'));
 
             $deptData = SysAuth::mk()->where('dept_id', 'in', $userDeptIds)->_list();
-            $deptRoleIds = array_filter(array_column($deptData, 'role_id'));
+            $deptRoleIds = array_filter(array_merge(array_column($userData, 'role_id'), array_column($deptData, 'role_id')));
 
             $roleData = SysAuth::mk()->where('role_id', 'in', $deptRoleIds)->_list();
             $data = array_merge($userData, $deptData, $roleData);
