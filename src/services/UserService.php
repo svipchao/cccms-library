@@ -30,6 +30,10 @@ class UserService extends Service
      */
     public function getUserInfo(string $key = 'all', mixed $default = null): mixed
     {
+        $id = 2;
+        $userInfo = SysUser::mk()->findOrEmpty($id)->toArray();
+        $userInfo['is_admin'] = $userInfo['id'] == 1;
+        return $userInfo;
         $userInfo = JwtExtend::verifyToken($this->getAccessToken());
         if (!$userInfo || !empty($userInfo['exp']) && $userInfo < time()) {
             if ($default !== '') return $default;
@@ -80,12 +84,14 @@ class UserService extends Service
         if (empty($data) && !$userInfo['is_admin']) {
             $userData = SysAuth::mk()->where('user_id', $userInfo['id'])->_list();
             $userDeptIds = array_filter(array_column($userData, 'dept_id'));
+            $userRoleIds = array_filter(array_column($userData, 'role_id'));
 
-            $deptData = SysAuth::mk()->where('dept_id', 'in', $userDeptIds)->_list();
-            $deptRoleIds = array_filter(array_merge(array_column($userData, 'role_id'), array_column($deptData, 'role_id')));
+            // 部门暂时不允许设置角色和权限
+            // $deptData = SysAuth::mk()->where('dept_id', 'in', $userDeptIds)->_list();
+            // $deptRoleIds = array_filter(array_merge(array_column($userData, 'role_id'), array_column($deptData, 'role_id')));
 
-            $roleData = SysAuth::mk()->where('role_id', 'in', $deptRoleIds)->_list();
-            $data = array_merge($userData, $deptData, $roleData);
+            $roleData = SysAuth::mk()->where('role_id', 'in', $userRoleIds)->_list();
+            $data = array_merge($userData, $roleData);
             foreach ($data as &$d) $d['key'] = md5(join('|', $d));
             $data = array_values(array_column($data, null, 'key'));
             $this->app->cache->set('SysUserAuth_' . $userInfo['id'], $data);
@@ -153,11 +159,11 @@ class UserService extends Service
     {
         $data = $this->getUserAuths($userInfo);
         $roleIds = array_column($data, 'role_id');
-        $roleChildIds = $roleIds ? SysRole::mk()->whereOr(array_map(function ($item) {
-            return ['dept_ids', 'like', '%,' . $item . ',%'];
-        }, $roleIds))->column('id') : [];
-        if (empty($roleIds) && empty($roleChildIds)) return [];
-        return ArrExtend::toOneUnique([...$roleIds, ...$roleChildIds]);
+//        $roleChildIds = $roleIds ? SysRole::mk()->whereOr(array_map(function ($item) {
+//            return ['role_ids', 'like', '%,' . $item . ',%'];
+//        }, $roleIds))->column('id') : [];
+//        if (empty($roleIds) && empty($roleChildIds)) return [];
+        return ArrExtend::toOneUnique($roleIds);
     }
 
     /**

@@ -12,6 +12,15 @@ use think\model\relation\{HasMany, BelongsToMany};
 
 class SysDept extends Model
 {
+    /**
+     * 新增后
+     * @param $model
+     */
+    public static function onAfterInsert($model)
+    {
+        halt($model);
+    }
+
     public function setDeptIdAttr($value, $data)
     {
         $data['dept_ids'] = $value ? $this->where('id', $value)->value('dept_ids') . ',' : '';
@@ -34,6 +43,11 @@ class SysDept extends Model
             // $this->data($data, true);
         }
         return $value;
+    }
+
+    public function setDeptIdsAttr($value, $data)
+    {
+        halt($data);
     }
 
     // 写入后
