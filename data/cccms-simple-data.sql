@@ -51,8 +51,3 @@ VALUES (1, 'admin/user/create'),
        (3, 'admin/dept/delete'),
        (3, 'admin/dept/update'),
        (3, 'admin/dept/index');
-
-SELECT `node`
-FROM `sys_role_node`
-WHERE `role_id` IN (SELECT `role_id` FROM `sys_dept_role` WHERE `dept_id` IN (1, 2))
-  AND `role_id` NOT IN (SELECT `id` FROM `sys_role` WHERE `status` = 0)
