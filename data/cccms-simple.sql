@@ -1,17 +1,18 @@
 CREATE TABLE `sys_user`
 (
-    `id`          int unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
-    `nickname`    varchar(32)  NOT NULL DEFAULT '' COMMENT '昵称',
-    `username`    varchar(32)  NOT NULL DEFAULT '' COMMENT '用户名',
-    `password`    varchar(32)  NOT NULL DEFAULT '' COMMENT '密码',
-    `phone`       varchar(11)  NOT NULL DEFAULT '' COMMENT '手机号',
-    `avatar`      varchar(255) NOT NULL DEFAULT '' COMMENT '头像',
+    `id`          int unsigned  NOT NULL AUTO_INCREMENT COMMENT 'ID',
+    `nickname`    varchar(32)   NOT NULL DEFAULT '' COMMENT '昵称',
+    `username`    varchar(32)   NOT NULL DEFAULT '' COMMENT '用户名',
+    `password`    varchar(32)   NOT NULL DEFAULT '' COMMENT '密码',
+    `phone`       varchar(11)   NOT NULL DEFAULT '' COMMENT '手机号',
+    `avatar`      varchar(255)  NOT NULL DEFAULT '' COMMENT '头像',
     `tags`        varchar(255) NOT NULL DEFAULT '' COMMENT '用户标签',
-    `status`      tinyint      NOT NULL DEFAULT 1 COMMENT '状态【0:禁用,1:正常】',
-    `delete_time` datetime     NOT NULL DEFAULT '1900-01-01 00:00:00' COMMENT '删除时间',
-    `create_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+    `status`      tinyint       NOT NULL DEFAULT 1 COMMENT '状态【0:禁用,1:正常】',
+    `delete_time` datetime      NOT NULL DEFAULT '1900-01-01 00:00:00' COMMENT '删除时间',
+    `create_time` datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`) USING BTREE,
+    INDEX `idx_username` (`username`) USING BTREE,
     INDEX `idx_nickname` (`nickname`) USING BTREE,
     INDEX `idx_tags` (`tags`) USING BTREE,
     INDEX `idx_status` (`status`) USING BTREE,
@@ -26,32 +27,32 @@ CREATE TABLE `sys_user_dept`
 (
     `user_id`    int unsigned NOT NULL DEFAULT 0 COMMENT '用户ID',
     `dept_id`    int unsigned NOT NULL DEFAULT 0 COMMENT '部门ID',
-    `post_range` tinyint(4)   NOT NULL DEFAULT 0 COMMENT '权限范围【0:本人,1:本部门,2:本部门及下属部门】',
+    `auth_range` tinyint(4)   NOT NULL DEFAULT 0 COMMENT '权限范围【0:本人,1:本部门,2:本部门及下属部门】',
     INDEX `idx_dept_id` (`dept_id`) USING BTREE,
     UNIQUE INDEX `uk_user_dept` (`user_id`, `dept_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci COMMENT = '用户部门表';
 
-CREATE TABLE `sys_user_role`
-(
-    `user_id` int unsigned NOT NULL DEFAULT 0 COMMENT '用户ID',
-    `role_id` int unsigned NOT NULL DEFAULT 0 COMMENT '角色ID',
-    INDEX `idx_role_id` (`role_id`) USING BTREE,
-    UNIQUE INDEX `uk_dept_role` (`user_id`, `role_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_general_ci COMMENT = '用户角色表';
+# CREATE TABLE `sys_user_role`
+# (
+#     `user_id` int unsigned NOT NULL DEFAULT 0 COMMENT '用户ID',
+#     `role_id` int unsigned NOT NULL DEFAULT 0 COMMENT '角色ID',
+#     INDEX `idx_role_id` (`role_id`) USING BTREE,
+#     UNIQUE INDEX `uk_dept_role` (`user_id`, `role_id`)
+# ) ENGINE = InnoDB
+#   DEFAULT CHARSET = utf8mb4
+#   COLLATE = utf8mb4_general_ci COMMENT = '用户角色表';
 
-CREATE TABLE `sys_user_post`
-(
-    `user_id` int unsigned NOT NULL DEFAULT 0 COMMENT '用户ID',
-    `post_id` int unsigned NOT NULL DEFAULT 0 COMMENT '岗位ID',
-    INDEX `idx_post_id` (`post_id`) USING BTREE,
-    UNIQUE INDEX `uk_user_post` (`user_id`, `post_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_general_ci COMMENT = '用户岗位表';
+# CREATE TABLE `sys_user_post`
+# (
+#     `user_id` int unsigned NOT NULL DEFAULT 0 COMMENT '用户ID',
+#     `post_id` int unsigned NOT NULL DEFAULT 0 COMMENT '岗位ID',
+#     INDEX `idx_post_id` (`post_id`) USING BTREE,
+#     UNIQUE INDEX `uk_user_post` (`user_id`, `post_id`)
+# ) ENGINE = InnoDB
+#   DEFAULT CHARSET = utf8mb4
+#   COLLATE = utf8mb4_general_ci COMMENT = '用户岗位表';
 
 CREATE TABLE `sys_dept`
 (
@@ -60,9 +61,9 @@ CREATE TABLE `sys_dept`
     `dept_path`   varchar(2048) NOT NULL DEFAULT '' COMMENT '父级ID集合',
     `dept_name`   varchar(32)   NOT NULL DEFAULT '' COMMENT '部门名称',
     `dept_desc`   varchar(255)  NOT NULL DEFAULT '' COMMENT '部门备注',
-    `post_id`     int unsigned  NOT NULL DEFAULT 0 COMMENT '默认岗位ID',
+    # `post_id`     int unsigned  NOT NULL DEFAULT 0 COMMENT '默认岗位ID',
     `status`      tinyint       NOT NULL DEFAULT 1 COMMENT '状态【0:禁用,1:正常】',
-    `delete_time` datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '删除时间',
+    `delete_time` datetime      NOT NULL DEFAULT '1900-01-01 00:00:00' COMMENT '删除时间',
     `create_time` datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`) USING BTREE
@@ -80,32 +81,32 @@ CREATE TABLE `sys_dept_role`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci COMMENT = '部门角色表';
 
-CREATE TABLE `sys_post`
-(
-    `id`          int unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
-#     `dept_id`     int unsigned NOT NULL DEFAULT 0 COMMENT '部门ID',
-    `post_id`     int unsigned NOT NULL DEFAULT 0 COMMENT '部门ID',
-    `post_name`   varchar(32)  NOT NULL DEFAULT '' COMMENT '岗位名称',
-    `post_desc`   varchar(255) NOT NULL DEFAULT '' COMMENT '岗位备注',
-#     `post_range`  tinyint(4)   NOT NULL DEFAULT 0 COMMENT '权限范围【0:本人,1:本人及下属,2:本部门,3:本部门及下属部门】',
-#     `is_default`  tinyint      NOT NULL DEFAULT 0 COMMENT '默认岗位【0:否,1:是】',
-    `status`      tinyint      NOT NULL DEFAULT 1 COMMENT '状态【0:禁用,1:正常】',
-    `delete_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '删除时间',
-    `create_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_general_ci COMMENT = '岗位表';
+# CREATE TABLE `sys_post`
+# (
+#     `id`          int unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+# #     `dept_id`     int unsigned NOT NULL DEFAULT 0 COMMENT '部门ID',
+#     `post_id`     int unsigned NOT NULL DEFAULT 0 COMMENT '部门ID',
+#     `post_name`   varchar(32)  NOT NULL DEFAULT '' COMMENT '岗位名称',
+#     `post_desc`   varchar(255) NOT NULL DEFAULT '' COMMENT '岗位备注',
+# #     `post_range`  tinyint(4)   NOT NULL DEFAULT 0 COMMENT '权限范围【0:本人,1:本人及下属,2:本部门,3:本部门及下属部门】',
+# #     `is_default`  tinyint      NOT NULL DEFAULT 0 COMMENT '默认岗位【0:否,1:是】',
+#     `status`      tinyint      NOT NULL DEFAULT 1 COMMENT '状态【0:禁用,1:正常】',
+#     `delete_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '删除时间',
+#     `create_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+#     `update_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+#     PRIMARY KEY (`id`) USING BTREE
+# ) ENGINE = InnoDB
+#   DEFAULT CHARSET = utf8mb4
+#   COLLATE = utf8mb4_general_ci COMMENT = '岗位表';
 
-CREATE TABLE `sys_post_role`
-(
-    `post_id` int unsigned NOT NULL DEFAULT 0 COMMENT '岗位ID',
-    `role_id` int unsigned NOT NULL DEFAULT 0 COMMENT '角色ID',
-    UNIQUE INDEX `uk_post_role` (`post_id`, `role_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_general_ci COMMENT = '岗位角色表';
+# CREATE TABLE `sys_post_role`
+# (
+#     `post_id` int unsigned NOT NULL DEFAULT 0 COMMENT '岗位ID',
+#     `role_id` int unsigned NOT NULL DEFAULT 0 COMMENT '角色ID',
+#     UNIQUE INDEX `uk_post_role` (`post_id`, `role_id`)
+# ) ENGINE = InnoDB
+#   DEFAULT CHARSET = utf8mb4
+#   COLLATE = utf8mb4_general_ci COMMENT = '岗位角色表';
 
 CREATE TABLE `sys_role`
 (
@@ -115,7 +116,7 @@ CREATE TABLE `sys_role`
     `role_name`   varchar(32)   NOT NULL DEFAULT '' COMMENT '角色名称',
     `role_desc`   varchar(255)  NOT NULL DEFAULT '' COMMENT '角色备注',
     `status`      tinyint       NOT NULL DEFAULT 1 COMMENT '状态【0:禁用,1:正常】',
-    `delete_time` datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '删除时间',
+    `delete_time` datetime      NOT NULL DEFAULT '1900-01-01 00:00:00' COMMENT '删除时间',
     `create_time` datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`) USING BTREE
@@ -145,6 +146,7 @@ CREATE TABLE `sys_menu`
     `target`      varchar(32)  NOT NULL DEFAULT '_self' COMMENT '链接打开方式',
     `sort`        int          NOT NULL DEFAULT 0 COMMENT '排序',
     `status`      tinyint      NOT NULL DEFAULT 1 COMMENT '状态【0:禁用,1:正常】',
+    `delete_time` datetime     NOT NULL DEFAULT '1900-01-01 00:00:00' COMMENT '删除时间',
     `create_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`) USING BTREE,
@@ -162,9 +164,8 @@ VALUES (1, 0, 0, '基础系统', 'ri-stack-line', '#', '#', 'default', '_self', 
        (7, 1, 1, '系统配置', 'ri-settings-line', '#', '#', 'default', '_self', 0, 1),
        (8, 1, 7, '系统设置', '', 'admin/config/index', 'admin/config/index', 'default', '_self', 0, 1),
        (9, 1, 7, '菜单管理', '', 'admin/menu/index', 'admin/menu/index', 'default', '_self', 0, 1),
-       (10, 1, 7, '路由管理', '', 'admin/route/index', 'admin/route/index', 'default', '_self', 0, 0),
-       (11, 1, 7, '附件管理', '', 'admin/file/index', 'admin/file/index', 'default', '_self', 0, 1),
-       (12, 1, 7, '日志管理', '', 'admin/log/index', 'admin/log/index', 'default', '_self', 0, 1);
+       (10, 1, 7, '附件管理', '', 'admin/file/index', 'admin/file/index', 'default', '_self', 0, 1),
+       (11, 1, 7, '日志管理', '', 'admin/log/index', 'admin/log/index', 'default', '_self', 0, 1);
 
 CREATE TABLE `sys_config_cate`
 (
@@ -204,7 +205,7 @@ INSERT INTO `sys_config` (`id`, `cate_name`, `name`, `label`, `value`, `configur
 VALUES (1, 'site', 'siteName', '网站名称', '诗无尽头i', '{"type":"input","placeholder":"请输入网站名称","default":"默认站点","description":"请输入网站名称"}'),
        (2, 'site', 'siteIcp', '备案号', '豫ICP备93093369号', '{"type":"input","placeholder":"请输入网站备案号","default":"豫ICP备93093369号","description":"请输入网站备案号"}'),
        (3, 'captcha', 'open', '启用验证码', 1, '{"type":"switch","default":1,"description":"是否启用验证码","options":{"checked":1,"unchecked":0}}'),
-       (4, 'captcha', 'math', '验证码类型', 0, '{"type":"select","placeholder":"请选择验证码类型","default":0,"description":"请选择验证码类型","options":[{"value":"0","label":"普通验证码"},{"value":"1","label":"算数验证码"}]}'),
+       (4, 'captcha', 'math', '验证码类型', 1, '{"type":"select","placeholder":"请选择验证码类型","default":0,"description":"请选择验证码类型","options":[{"value":"0","label":"普通验证码"},{"value":"1","label":"算数验证码"}]}'),
        (5, 'captcha', 'length', '验证码位数', 4, '{"type":"input-number","placeholder":"请输入验证码位数，建议4位或5位","default":4,"description":"请输入验证码位数，建议4位或5位"}'),
        (6, 'captcha', 'fontSize', '验证码字体大小', 22, '{"type":"input-number","placeholder":"请输入验证码字体大小(px)","default":22,"description":"请输入验证码字体大小(px)"}'),
        (7, 'captcha', 'matchCase', '是否区分大小写', 0, '{"type":"switch","default":0,"description":"是否区分大小写","options":{"checked":1,"unchecked":0}}'),
@@ -224,6 +225,7 @@ CREATE TABLE `sys_file_cate`
     `cate_name`   varchar(32)  NOT NULL DEFAULT '' COMMENT '附件标识',
     `cate_desc`   varchar(255) NOT NULL DEFAULT '' COMMENT '附件描述',
     `sort`        int          NOT NULL DEFAULT 0 COMMENT '排序',
+    `delete_time` datetime     NOT NULL DEFAULT '1900-01-01 00:00:00' COMMENT '删除时间',
     `create_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`) USING BTREE
