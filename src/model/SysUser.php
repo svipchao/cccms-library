@@ -197,6 +197,13 @@ class SysUser extends Model
         return $value ? implode(',', $value) : '';
     }
 
+    public function searchStatusAttr($query, $value): void
+    {
+        $query->when($value, function ($query) use ($value) {
+            $query->where('status', $value);
+        });
+    }
+
     public function searchTagAttr($query, $value): void
     {
         $query->when($value, function ($query) use ($value) {
