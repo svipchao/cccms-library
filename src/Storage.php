@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace cccms;
 
 use think\{App, Container, Validate};
-use cccms\model\SysFile;
-use cccms\model\SysFileCate;
 use cccms\services\ConfigService;
+use cccms\model\{SysFile, SysFileCate};
 
 /**
  * 文件存储
