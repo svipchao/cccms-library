@@ -239,20 +239,17 @@ abstract class Storage
      * 上传文件
      * @param $files
      * @param int|string $pathOrId int 则为文件类型ID，string则为文件夹名称
-     * @return mixed
      */
-    abstract public function upload($files, int|string $pathOrId = 0): mixed;
+    abstract public function upload($files, int|string $pathOrId = 0);
 
     /**
      * 删除文件
      * @param int $pathOrId int 则为文件类型ID，string则为文件夹名称
-     * @return mixed
      */
-    abstract public function delete(int $pathOrId): mixed;
+    abstract public function delete(int $pathOrId);
 
     /**
      * 文件列表
-     * @return mixed
      */
-    abstract public function read(): mixed;
+    abstract public function read();
 }
