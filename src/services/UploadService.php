@@ -10,14 +10,14 @@ class UploadService extends Service
 {
     /**
      * 文件上传
-     * @param int|string $pathOrId int 则为文件类型ID，string则为文件夹名称
+     * @param int|string $folderOrCateId int 则为文件类型ID，string则为文件夹名称
      * @return array
      */
-    public function upload(int|string $pathOrId = 0): array
+    public function upload(int|string $folderOrCateId = 0): array
     {
         $file = static::$request->file('file');
         if (!empty($file)) {
-            $file = Storage::instance()->upload($file, $pathOrId);
+            $file = Storage::instance()->upload($file, $folderOrCateId);
             if (in_array($file['file_ext'], ['jpg', 'gif', 'png', 'bmp', 'jpeg', 'wbmp'])) {
                 // 图片压缩
                 $filePath = static::$app->getRootPath() . 'public/uploads/' . $file['file_url'];
