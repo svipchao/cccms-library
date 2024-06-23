@@ -12,12 +12,12 @@ class LocalStorage extends Storage
     /**
      * 上传文件
      * @param $files
-     * @param int|string $pathOrId int 则为文件类型ID，string则为文件夹名称
+     * @param int|string $folderOrCateId int 则为文件类型ID，string则为文件夹名称
      * @return array
      */
-    public function upload($files, int|string $pathOrId = 0): array
+    public function upload($files, int|string $folderOrCateId = 0): array
     {
-        if (empty($pathOrId)) return [];
+        if (empty($folderOrCateId)) return [];
         $res = $this->validateFile($files);
         $this->app->config->set([
             'disks' => [
@@ -25,9 +25,9 @@ class LocalStorage extends Storage
             ]
         ], 'filesystem');
         $saveName = [];
-        if (is_string($pathOrId)) {
+        if (is_string($folderOrCateId)) {
             foreach ($res as $val) {
-                $file_url = str_replace('\\', '/', Filesystem::putFile($pathOrId, $val, 'date("Y-m-d")'));
+                $file_url = str_replace('\\', '/', Filesystem::putFile($folderOrCateId, $val, 'date("Y-m-d")'));
                 $saveName[] = [
                     'file_url' => $file_url,
                     'file_name' => $val->getoriginalName(),
@@ -40,12 +40,12 @@ class LocalStorage extends Storage
             }
         } else {
             $user_id = UserService::instance()->getUserInfo('id');
-            $path = $this->getCatePath((int)$pathOrId);
+            $path = $this->getCatePath($folderOrCateId);
             foreach ($res as $val) {
                 $file_url = str_replace('\\', '/', Filesystem::putFile($path, $val, 'date("Y-m-d")'));
                 $saveName[] = [
                     'user_id' => $user_id,
-                    'cate_id' => $pathOrId,
+                    'cate_id' => $folderOrCateId,
                     'file_url' => $file_url,
                     'file_name' => $val->getoriginalName(),
                     'file_size' => $val->getSize(),
@@ -63,17 +63,17 @@ class LocalStorage extends Storage
 
     /**
      * 删除文件
-     * @param int|string $pathOrId int 则为文件类型ID，string则为文件夹名称
+     * @param int|string $folderOrCateId int 则为文件类型ID，string则为文件夹名称
      * @return bool
      */
-    public function delete($pathOrId = 0): bool
+    public function delete($folderOrCateId = 0): bool
     {
-        if (is_string($pathOrId)) {
+        if (is_string($folderOrCateId)) {
             // 替换..防止跨目录删除
-            $filePath = $this->getLocalPath() . strtr($pathOrId, '..', '');
+            $filePath = $this->getLocalPath() . strtr($folderOrCateId, '..', '');
         } else {
-            if (empty($pathOrId)) return false;
-            $fileInfo = $this->model->with('cate')->findOrEmpty($pathOrId);
+            if (empty($folderOrCateId)) return false;
+            $fileInfo = $this->model->with('cate')->findOrEmpty($folderOrCateId);
             if (!$fileInfo->isEmpty()) {
                 $fileInfo->delete();
             }
