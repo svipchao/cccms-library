@@ -80,7 +80,7 @@ class LocalStorage extends Storage
                 $fileInfo->delete();
             }
             // 磁盘文件路径
-            $filePath = $this->getLocalPath() . $fileInfo['file_url'];
+            $filePath = $this->getLocalPath() . $fileInfo['file_path'];
         }
         // 判断附件是否在磁盘中
         if (file_exists($filePath) && !unlink($filePath)) {
