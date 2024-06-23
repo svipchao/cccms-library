@@ -27,9 +27,10 @@ class LocalStorage extends Storage
         $saveName = [];
         if (is_string($folderOrCateId)) {
             foreach ($res as $val) {
-                $file_url = str_replace('\\', '/', Filesystem::putFile($folderOrCateId, $val, 'date("Y-m-d")'));
+                $file_path = str_replace('\\', '/', Filesystem::putFile($folderOrCateId, $val, 'date("Y-m-d")'));
                 $saveName[] = [
-                    'file_url' => $file_url,
+                    'file_path' => $file_path,
+                    'file_url' => $this->request->domain() . '/uploads/' . $file_path,
                     'file_name' => $val->getoriginalName(),
                     'file_size' => $val->getSize(),
                     'file_ext' => $val->getOriginalExtension(),
@@ -42,11 +43,12 @@ class LocalStorage extends Storage
             $user_id = UserService::instance()->getUserInfo('id');
             $path = $this->getCatePath($folderOrCateId);
             foreach ($res as $val) {
-                $file_url = str_replace('\\', '/', Filesystem::putFile($path, $val, 'date("Y-m-d")'));
+                $file_path = str_replace('\\', '/', Filesystem::putFile($path, $val, 'date("Y-m-d")'));
                 $saveName[] = [
                     'user_id' => $user_id,
                     'cate_id' => $folderOrCateId,
-                    'file_url' => $file_url,
+                    'file_path' => $file_path,
+                    'file_url' => $this->request->domain() . '/uploads/' . $file_path,
                     'file_name' => $val->getoriginalName(),
                     'file_size' => $val->getSize(),
                     'file_ext' => $val->getOriginalExtension(),
