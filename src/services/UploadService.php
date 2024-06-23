@@ -20,7 +20,7 @@ class UploadService extends Service
             $file = Storage::instance()->upload($file, $folderOrCateId);
             if (in_array($file['file_ext'], ['jpg', 'gif', 'png', 'bmp', 'jpeg', 'wbmp'])) {
                 // 图片压缩
-                $filePath = static::$app->getRootPath() . 'public/uploads/' . $file['file_url'];
+                $filePath = static::$app->getRootPath() . 'public/uploads/' . $file['file_path'];
                 Image::open($filePath)->save($filePath, $file['file_ext'], 90);
             }
             return $file;
