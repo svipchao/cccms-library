@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace cccms;
 
-use think\{App, Container, Validate};
 use cccms\services\ConfigService;
 use cccms\model\{SysFile, SysFileCate};
+use think\{App, Container, Request, Validate};
 
 /**
  * 文件存储
@@ -17,6 +17,11 @@ abstract class Storage
      * @var App
      */
     protected App $app;
+
+    /**
+     * @var Request
+     */
+    protected Request $request;
 
     /**
      * @var SysFile
@@ -30,6 +35,7 @@ abstract class Storage
     public function __construct(App $app)
     {
         $this->app = $app;
+        $this->request = $app->request;
         $this->model = SysFile::mk();
     }
 
