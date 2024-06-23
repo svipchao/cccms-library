@@ -11,7 +11,7 @@ class SysFile extends Model
 {
     protected $hidden = ['type', 'user'];
 
-    protected $append = ['file_link'];
+    protected $append = ['file_share', 'file_url'];
 
     public function cate(): HasOne
     {
@@ -38,8 +38,13 @@ class SysFile extends Model
         return FormatExtend::formatBytes($value);
     }
 
-    public function getFileLinkAttr($value, $data): string
+    public function getFileShareAttr($value, $data): string
     {
         return request()->domain() . '/file/' . ($data['file_code'] ?? '404');
+    }
+
+    public function getFileUrlAttr($value, $data): string
+    {
+        return request()->domain() . '/uploads/' . ($data['file_path'] ?? '404');
     }
 }
