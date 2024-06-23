@@ -98,7 +98,7 @@ abstract class Storage
         // 获取磁盘类型
         $diskPath = ConfigService::instance()->getConfig('storage.diskType', 'local');
         if ($diskPath === 'local') $diskPath = $this->getLocalPath();
-        $diskPath = str_replace(['\\', '//'], ['/', '/'], $diskPath . '/' . $file['file_url']);
+        $diskPath = str_replace(['\\', '//'], ['/', '/'], $diskPath . '/' . $file['file_path']);
         // 判断附件是否在磁盘中
         if (!$resFile = @readfile($diskPath)) {
             _result(['code' => 404, 'msg' => '无法访问附件'], _getEnCode());
