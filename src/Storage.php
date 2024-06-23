@@ -10,8 +10,6 @@ use cccms\model\{SysFile, SysFileCate};
 
 /**
  * 文件存储
- * Library for ThinkAdmin
- * https://gitee.com/zoujingli/ThinkLibrary
  */
 abstract class Storage
 {
@@ -210,15 +208,15 @@ abstract class Storage
 
     /**
      * 根据文件后缀获取文件MINE
-     * @param array|string $exts 文件后缀
+     * @param array|string $ext 文件后缀
      * @param array $mime 文件信息
      * @return string
      */
-    public static function mime(array|string $exts, array $mime = []): string
+    public static function mime(array|string $ext, array $mime = []): string
     {
         $mimes = static::mimes();
-        foreach (is_string($exts) ? explode(',', $exts) : $exts as $ext) {
-            $mime[] = $mimes[strtolower($ext)] ?? 'application/octet-stream';
+        foreach (is_string($ext) ? explode(',', $ext) : $ext as $e) {
+            $mime[] = $mimes[strtolower($e)] ?? 'application/octet-stream';
         }
         return join(',', array_unique($mime));
     }
@@ -237,15 +235,15 @@ abstract class Storage
     /**
      * 上传文件
      * @param $files
-     * @param int|string $pathOrId int 则为文件类型ID，string则为文件夹名称
+     * @param int|string $folderOrCateId int 则为文件类型ID，string则为文件夹名称
      */
-    abstract public function upload($files, int|string $pathOrId = 0);
+    abstract public function upload($files, int|string $folderOrCateId = 0);
 
     /**
      * 删除文件
-     * @param int $pathOrId int 则为文件类型ID，string则为文件夹名称
+     * @param int $folderOrCateId int 则为文件类型ID，string则为文件夹名称
      */
-    abstract public function delete(int $pathOrId);
+    abstract public function delete(int $folderOrCateId);
 
     /**
      * 文件列表
