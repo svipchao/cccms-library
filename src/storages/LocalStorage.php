@@ -58,7 +58,7 @@ class LocalStorage extends Storage
                     'file_code' => md5(mt_rand($user_id, time()) . $val->hashName() . $val->getPathname()),
                 ];
             }
-            $this->model->insertAll($saveName);
+            $this->model->strict(false)->insertAll($saveName);
         }
         return count($saveName) > 1 ? $saveName : $saveName[0];
     }
