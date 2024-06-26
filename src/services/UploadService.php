@@ -20,8 +20,12 @@ class UploadService extends Service
             $file = Storage::instance()->upload($file, $folderOrCateId);
             if (in_array($file['file_ext'], ['jpg', 'gif', 'png', 'bmp', 'jpeg', 'wbmp'])) {
                 // 图片压缩
-                $filePath = static::$app->getRootPath() . 'public/uploads/' . $file['file_path'];
-                Image::open($filePath)->save($filePath, $file['file_ext'], 90);
+                $compressLevel = ConfigService::getConfig('storage.compressLevel', 10);
+                $compressLevel = max(1, min(10, $compressLevel));
+                if ($compressLevel !== 10) {
+                    $filePath = static::$app->getRootPath() . 'public/uploads/' . $file['file_path'];
+                    Image::open($filePath)->save($filePath, $file['file_ext'], $compressLevel * 10);
+                }
             }
             return $file;
         }
