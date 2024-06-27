@@ -52,7 +52,7 @@ class SysDept extends Model
     {
         parent::onBeforeDelete($model);
         $data = $model->toArray();
-        $sonCount = $model->whereFindInSet('dept_id', $data['id'])->count();
+        $sonCount = $model->whereFindInSet('dept_path', $data['id'])->count();
         if (!empty($sonCount)) {
             _result(['code' => 403, 'msg' => '存在子级部门 禁止删除'], _getEnCode());
         }
