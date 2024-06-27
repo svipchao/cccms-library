@@ -24,6 +24,20 @@ class UploadService extends Service
                 $compressLevel = max(1, min(10, $compressLevel));
                 if ($compressLevel !== 10) {
                     $filePath = static::$app->getRootPath() . 'public/uploads/' . $file['file_path'];
+                    $exif = exif_read_data($filePath);
+                    $image = imagecreatefromjpeg($filePath);
+                    if ($exif['Orientation'] == 3) {
+                        $result = imagerotate($image, 180, 0);
+                        imagejpeg($result, $filePath, 100);
+                    } elseif ($exif['Orientation'] == 6) {
+                        $result = imagerotate($image, -90, 0);
+                        imagejpeg($result, $filePath, 100);
+                    } elseif ($exif['Orientation'] == 8) {
+                        $result = imagerotate($image, 90, 0);
+                        imagejpeg($result, $filePath, 100);
+                    }
+                    isset($result) && imagedestroy($result);
+                    imagedestroy($image);
                     Image::open($filePath)->save($filePath, $file['file_ext'], $compressLevel * 10);
                 }
             }
