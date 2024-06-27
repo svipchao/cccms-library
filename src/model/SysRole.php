@@ -54,7 +54,7 @@ class SysRole extends Model
     {
         parent::onBeforeDelete($model);
         $data = $model->toArray();
-        $sonCount = $model->whereFindInSet('role_id', $data['id'])->count();
+        $sonCount = $model->whereFindInSet('role_path', $data['id'])->count();
         if (!empty($sonCount)) {
             _result(['code' => 403, 'msg' => '存在子级角色 禁止删除'], _getEnCode());
         }
