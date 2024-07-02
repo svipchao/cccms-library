@@ -2,11 +2,9 @@
 declare (strict_types=1);
 
 return [
-    'nickname|昵称' => 'require|chsDash|length:2,32|unique:sys_user',
+    'nickname|昵称' => 'require|length:2,32',
     'nickname.require' => '%s 不能为空',
-    'nickname.chsDash' => '%s 只能是汉字、字母、数字和下划线_及破折号-',
     'nickname.length' => '%s 长度至少 2 个字符或不超过 32 个字符',
-    'nickname.unique' => '%s 已存在',
 
     'username|用户名' => 'require|alphaDash|length:5,32|unique:sys_user',
     'username.require' => '%s 不能为空',

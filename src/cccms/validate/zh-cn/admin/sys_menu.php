@@ -6,9 +6,8 @@ return [
     'menu_id.integer' => '请选择正确的 %s',
     'menu_id.different' => '禁止选择自身为 %s',
 
-    'name|菜单名称' => 'require|chsDash|length:1,255',
+    'name|菜单名称' => 'require|length:1,255',
     'name.require' => '%s 不能为空',
-    'name.chsDash' => '%s 只能为汉字、字母、数字和下划线_及破折号-',
     'name.length' => '%s 长度至少 1 个字符或不超过 32 个字符',
 
     'icon|菜单图标' => 'alphaDash|length:0,32',
