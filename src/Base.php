@@ -42,7 +42,7 @@ abstract class Base extends stdClass
         $this->init();
 
         // 权限拦截
-        $this->check();
+        $this->auth_check();
 
         $this->app->isDebug() && $this->app->cache->clear();
     }
@@ -55,7 +55,7 @@ abstract class Base extends stdClass
     /**
      * 权限拦截
      */
-    public function check(): void
+    public function auth_check(): void
     {
         $node = NodeService::instance()->getCurrentNodeInfo();
         if (empty($node)) {
