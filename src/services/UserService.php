@@ -97,9 +97,10 @@ class UserService extends Service
     /**
      * 获取用户拥有的部门(权限范围)
      * @param int $user_id
+     * @param bool $isNodeAuth
      * @return array
      */
-    public static function getUserDept(int $user_id = 0): array
+    public static function getUserDept(int $user_id = 0, bool $isNodeAuth = false): array
     {
         if (static::isAdmin()) return SysDept::mk()->getAllOpenDept();
         $user_id = $user_id ?: static::getUserId();
@@ -111,6 +112,9 @@ class UserService extends Service
                 $deptIds[$relation['dept_id']] = $relation['dept_id'];
             } elseif ($relation['auth_range'] == 2) {
                 $range3Ids[$relation['dept_id']] = $relation['dept_id'];
+            } else {
+                // 唯一的区别就是节点权限和数据权限
+                $isNodeAuth && $deptIds[$relation['dept_id']] = $relation['dept_id'];
             }
         }
         // $dept = SysDept::mk()->whereFindInSet('dept_path', 2)->select()->toArray();
@@ -124,13 +128,14 @@ class UserService extends Service
     /**
      * 获取用户拥有的部门ID(权限范围)
      * @param int $user_id
+     * @param bool $isNodeAuth
      * @return array
      */
-    public static function getUserDeptIds(int $user_id = 0): array
+    public static function getUserDeptIds(int $user_id = 0, bool $isNodeAuth = false): array
     {
         if (static::isAdmin()) return SysDept::mk()->getAllOpenDeptIds();
         $user_id = $user_id ?: static::getUserId();
-        $dept = static::getUserDept($user_id);
+        $dept = static::getUserDept($user_id, $isNodeAuth);
         return array_column($dept, 'id');
     }
 }
