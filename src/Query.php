@@ -16,7 +16,7 @@ class Query extends \think\db\Query
      * @param null $value
      * @return mixed
      */
-    public function _withSearch(array|string $fields, array $data = [], string $prefix = '', $value = null): Query
+    public function _withSearch(array|string $fields, array $data = [], bool $strict = true, $value = null): Query
     {
         if (is_string($fields)) {
             $fields = explode(',', $fields);
@@ -26,7 +26,7 @@ class Query extends \think\db\Query
                 unset($fields[$key], $data[$field]);
             }
         }
-        return parent::withSearch($fields, $data, $prefix);
+        return parent::withSearch($fields, $data, $strict);
     }
 
     /**
