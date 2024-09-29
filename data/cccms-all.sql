@@ -427,7 +427,7 @@ CREATE TABLE `sys_file`
     `update_time`  datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`) USING BTREE,
     UNIQUE KEY `idx_file_code` (`file_code`),
-    INDEX `idx_file_id` (`cate_id`) USING BTREE,
+    INDEX `idx_cate_id` (`cate_id`) USING BTREE,
     INDEX `idx_user_id` (`user_id`) USING BTREE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
