@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace cccms\services;
 
@@ -32,7 +32,9 @@ class NodeService extends Service
 
     /**
      * 合并框架节点
+     *
      * @param array $nodes
+     *
      * @return array
      */
     public static function setFrameNodes(array $nodes): array
@@ -120,7 +122,9 @@ class NodeService extends Service
 
     /**
      * 获取节点信息
+     *
      * @param string $node 权限节点(键)
+     *
      * @return array
      */
     public static function getCurrentNodeInfo(string $node = ''): array
@@ -130,8 +134,10 @@ class NodeService extends Service
 
     /**
      * 获取所有控制器方法
+     *
      * @param array $toScanFileArray 待扫描文件数组
-     * @param bool $isCache
+     * @param bool  $isCache
+     *
      * @return array
      */
     public static function getNodesInfo(array $toScanFileArray = [], bool $isCache = false): array
@@ -200,9 +206,11 @@ class NodeService extends Service
 
     /**
      * 解析硬节点属性
+     *
      * @param string $comment 备注内容
      * @param string $defaultTitle
      * @param string $node
+     *
      * @return array
      */
     private static function parseComment(string $comment, string $defaultTitle = '', string $node = ''): array
@@ -212,9 +220,9 @@ class NodeService extends Service
         foreach (['@auth', '@login', '@methods'] as $find) {
             if (stripos($title, $find) === 0) $title = $defaultTitle;
         }
-        preg_match('/@encode.(\S+)/i', $text, $enCode);
-        preg_match('/@sort.(\S+)/i', $text, $sort);
-        preg_match('/@methods.(\S+)/i', $text, $methods);
+        preg_match('/@encode\s+(\S+)/i', $text, $enCode);
+        preg_match('/@sort\s+(\S+)/i', $text, $sort);
+        preg_match('/@methods\s+(\S+)/i', $text, $methods);
         // 请求返回编码 view|json|jsonp|xml
         // 请求类型详细解释请看 https://www.kancloud.cn/manual/thinkphp6_0/1037520
         $letters = 'abcdefghijklmnopqrstuvwxyz';
